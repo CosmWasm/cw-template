@@ -7,7 +7,7 @@ use cosmwasm::types::{coin, mock_params, CosmosMsg};
 use cosmwasm_vm::{call_handle, call_init, instantiate, with_storage};
 use {{crate_name}}::contract::{HandleMsg, InitMsg, State, CONFIG_KEY};
 
-static wasm_file: &str = "./target/wasm32-unknown-unknown/release/{{crate_name}}.wasm";
+static WASM_FILE: &str = "./target/wasm32-unknown-unknown/release/{{crate_name}}.wasm";
 
 /**
 This integration test tries to run and call the generated wasm.
@@ -23,7 +23,7 @@ Then running `cargo test` will validate we can properly call into that generated
 // Making it as easy to write vm external integration tests as rust unit tests
 #[test]
 fn successful_init_and_handle() {
-    let wasm = fs::read(wasm_file).unwrap();
+    let wasm = fs::read(WASM_FILE).unwrap();
     assert!(wasm.len() > 100000);
     let mut instance = instantiate(&wasm);
 
@@ -74,7 +74,7 @@ fn successful_init_and_handle() {
 
 #[test]
 fn failed_handle() {
-    let wasm = fs::read(wasm_file).unwrap();
+    let wasm = fs::read(WASM_FILE).unwrap();
     assert!(wasm.len() > 100000);
     let mut instance = instantiate(&wasm);
 
