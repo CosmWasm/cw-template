@@ -1,0 +1,30 @@
+[package]
+name = "{{project-name}}"
+version = "0.1.0"
+authors = ["{{authors}}"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[profile.release]
+opt-level = "s"
+debug = false
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+panic = 'unwind'
+incremental = false
+overflow-checks = true
+
+[dependencies]
+cosmwasm = { version = "0.1.0" }
+serde_json = { version = "1.0.41" }
+serde = { version = "1.0.60", default-features = false, features = ["derive"] }
+failure = "0.1.5"
+
+[dev-dependencies]
+cosmwasm-vm = { version = "0.1.0" }
