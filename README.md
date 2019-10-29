@@ -96,11 +96,22 @@ wasm also behaves as desired in the real system.
 ## Preparing the wasm for production
 
 Before we upload it to a chain, we need to ensure the smallest output size possible,
-as this will be included in the body of a transaction.
+as this will be included in the body of a transaction. We also want to have a
+reproducible build process, so third parties can verify that the uploaded wasm
+code did indeed come from the claimed rust code.
 
-**TODO**
+To solve both these issues, we have produced `cosmwasm-opt`, a docker image to
+produce an extremely small build output in a consistent manner. To use it,
 
-* Document how to set up and use `wasm-gc`.
-* Other docs? `wasm-bindgen`?
+Linux: `docker run --rm -u $(id -u):$(id -g) -v $(pwd):/code confio/cosmwasm-opt:0.4.1`
 
-Currently the sample app weighs in at 172kB compiled wasm, but we hope to reduce that.
+This produces a `contract.wasm` file in the current directory (which must be the root
+directory of your rust project, the one with `Cargo.toml` inside). The current sample
+contract compiles down to around 48kB wasm file.
+
+Note this will take a while, as it doesn't share the cargo registry nor the incremental
+compilation cache with your host system, in order to provide the most consistent setup.
+
+We also track the versions of cosmwasm that we aim for compatibility. The most important
+aspect is the same version of wasm-pack and wasm-bindgen. For 0.4.1 we are tied to
+wasm-pack 0.8.1, wasm-bindgen 0.2.53, and rust 1.38.
