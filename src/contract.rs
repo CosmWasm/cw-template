@@ -1,9 +1,10 @@
-use cosmwasm::storage::Storage;
-use cosmwasm::types::{CosmosMsg, Params};
-
-use failure::{bail, format_err, Error};
 use serde::{Deserialize, Serialize};
-use serde_json::{from_slice, to_vec};
+use snafu::{OptionExt, ResultExt};
+
+use cosmwasm::errors::{ContractErr, ParseErr, Result, SerializeErr, Unauthorized};
+use cosmwasm::serde::{from_slice, to_vec};
+use cosmwasm::storage::Storage;
+use cosmwasm::types::{CosmosMsg, Params, Response};
 
 #[derive(Serialize, Deserialize)]
 pub struct InitMsg {
@@ -23,41 +24,39 @@ pub struct HandleMsg {}
 
 pub static CONFIG_KEY: &[u8] = b"config";
 
-pub fn init<T: Storage>(
-    store: &mut T,
-    params: Params,
-    msg: Vec<u8>,
-) -> Result<Vec<CosmosMsg>, Error> {
-    let msg: InitMsg = from_slice(&msg)?;
+pub fn init<T: Storage>(store: &mut T, params: Params, msg: Vec<u8>) -> Result<Response> {
+    let msg: InitMsg = from_slice(&msg).context(ParseErr {})?;
     store.set(
         CONFIG_KEY,
         &to_vec(&State {
             verifier: msg.verifier,
             beneficiary: msg.beneficiary,
             funder: params.message.signer,
-        })?,
+        })
+            .context(SerializeErr {})?,
     );
-    Ok(Vec::new())
+    Ok(Response::default())
 }
 
-pub fn handle<T: Storage>(
-    store: &mut T,
-    params: Params,
-    _: Vec<u8>,
-) -> Result<Vec<CosmosMsg>, Error> {
-    let data = store
-        .get(CONFIG_KEY)
-        .ok_or(format_err!("not initialized"))?;
-    let state: State = from_slice(&data)?;
+pub fn handle<T: Storage>(store: &mut T, params: Params, _: Vec<u8>) -> Result<Response> {
+    let data = store.get(CONFIG_KEY).context(ContractErr {
+        msg: "uninitialized data".to_string(),
+    })?;
+    let state: State = from_slice(&data).context(ParseErr {})?;
 
     if params.message.signer == state.verifier {
-        Ok(vec![CosmosMsg::SendTx {
-            from_address: params.contract.address,
-            to_address: state.beneficiary,
-            amount: params.contract.balance,
-        }])
+        let res = Response {
+            messages: vec![CosmosMsg::Send {
+                from_address: params.contract.address,
+                to_address: state.beneficiary,
+                amount: params.contract.balance,
+            }],
+            log: Some("released funds!".to_string()),
+            data: None,
+        };
+        Ok(res)
     } else {
-        bail!("Unauthorized")
+        Unauthorized {}.fail()
     }
 }
 
@@ -70,14 +69,14 @@ mod tests {
     #[test]
     fn proper_initialization() {
         let mut store = MockStorage::new();
-        let msg = serde_json::to_vec(&InitMsg {
+        let msg = to_vec(&InitMsg {
             verifier: String::from("verifies"),
             beneficiary: String::from("benefits"),
         })
-        .unwrap();
+            .unwrap();
         let params = mock_params("creator", &coin("1000", "earth"), &[]);
         let res = init(&mut store, params, msg).unwrap();
-        assert_eq!(0, res.len());
+        assert_eq!(0, res.messages.len());
 
         // it worked, let's check the state
         let data = store.get(CONFIG_KEY).expect("no data stored");
@@ -101,22 +100,22 @@ mod tests {
         let mut store = MockStorage::new();
 
         // initialize the store
-        let init_msg = serde_json::to_vec(&InitMsg {
+        let init_msg = to_vec(&InitMsg {
             verifier: String::from("verifies"),
             beneficiary: String::from("benefits"),
         })
-        .unwrap();
+            .unwrap();
         let init_params = mock_params("creator", &coin("1000", "earth"), &coin("1000", "earth"));
         let init_res = init(&mut store, init_params, init_msg).unwrap();
-        assert_eq!(0, init_res.len());
+        assert_eq!(0, init_res.messages.len());
 
         // beneficiary can release it
         let handle_params = mock_params("verifies", &coin("15", "earth"), &coin("1015", "earth"));
         let handle_res = handle(&mut store, handle_params, Vec::new()).unwrap();
-        assert_eq!(1, handle_res.len());
-        let msg = handle_res.get(0).expect("no message");
+        assert_eq!(1, handle_res.messages.len());
+        let msg = handle_res.messages.get(0).expect("no message");
         match &msg {
-            CosmosMsg::SendTx {
+            CosmosMsg::Send {
                 from_address,
                 to_address,
                 amount,
@@ -128,6 +127,7 @@ mod tests {
                 assert_eq!(coin.denom, "earth");
                 assert_eq!(coin.amount, "1015");
             }
+            _ => panic!("Unexpected message type"),
         }
 
         // it worked, let's check the state
@@ -143,14 +143,14 @@ mod tests {
         let mut store = MockStorage::new();
 
         // initialize the store
-        let init_msg = serde_json::to_vec(&InitMsg {
+        let init_msg = to_vec(&InitMsg {
             verifier: String::from("verifies"),
             beneficiary: String::from("benefits"),
         })
-        .unwrap();
+            .unwrap();
         let init_params = mock_params("creator", &coin("1000", "earth"), &coin("1000", "earth"));
         let init_res = init(&mut store, init_params, init_msg).unwrap();
-        assert_eq!(0, init_res.len());
+        assert_eq!(0, init_res.messages.len());
 
         // beneficiary can release it
         let handle_params = mock_params("benefits", &[], &coin("1000", "earth"));
