@@ -51,13 +51,14 @@ making any changes. Go into the
 cargo wasm
 
 # this runs unit tests with helpful backtraces
+RUST_BACKTRACES=1 cargo unit-test
 RUST_BACKTRACES=1 cargo test -lib --features backtraces
 
 # this runs integration tests with cranelift backend (uses rust stable)
-cargo test --no-default-features --features cranelift
+cargo test
 
 # this runs integration tests with singlepass backend (needs rust nightly)
-cargo test
+cargo test --no-default-features --features singlepass
 ```
 
 The wasmer engine, embedded in `cosmwasm-vm` supports multiple backends: 
