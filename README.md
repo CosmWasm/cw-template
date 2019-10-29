@@ -8,8 +8,9 @@ This assumes you understand the theory and just want to get coding.
 
 ## Creating a new repo from template
 
-Before starting, make sure you have `rustup` along with a recent `rustc` and `cargo` 
+Before starting, make sure you have [rustup](https://rustup.rs/) along with a recent `rustc` and `cargo` 
 version installed. Currently, we are testing on 1.37+. 
+ 
 And you need to have the `wasm32-unknown-unknown` target installed as well.
 
 You can check that via:
@@ -49,9 +50,27 @@ making any changes. Go into the
 # this will produce a wasm build in ./target/wasm32-unknown-unknown/release/YOUR_NAME_HERE.wasm
 cargo wasm
 
-# this runs unit tests and integration tests
+# this runs unit tests with helpful backtraces
+RUST_BACKTRACES=1 cargo test -lib --features backtraces
+
+# this runs integration tests with cranelift backend (uses rust stable)
+cargo test --no-default-features --features cranelift
+
+# this runs integration tests with singlepass backend (needs rust nightly)
 cargo test
 ```
+
+The wasmer engine, embedded in `cosmwasm-vm` supports multiple backends: 
+singlepass and cranelift. Singlepass has fast compile times and slower run times,
+and supportes gas metering. It also requires rust `nightly`. This is used as default
+when embedding `cosmwasm-vm` in `go-cosmwasm` and is needed to use if you want to
+check the gas usage. 
+
+However, when just building contacts, if you don't want to worry about installing
+two rust toolchains, you can run all tests with cranelift. The integration tests
+may take a small bit longer, but the results will be the same. The only difference 
+is that you can not check gas usage here, so if you wish to optimize gas, you must
+switch to nightly and run with cranelift.
 
 ### Understanding the tests
 
