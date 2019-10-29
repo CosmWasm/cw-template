@@ -8,8 +8,9 @@ This assumes you understand the theory and just want to get coding.
 
 ## Creating a new repo from template
 
-Before starting, make sure you have `rustup` along with a recent `rustc` and `cargo` 
+Before starting, make sure you have [rustup](https://rustup.rs/) along with a recent `rustc` and `cargo` 
 version installed. Currently, we are testing on 1.37+. 
+ 
 And you need to have the `wasm32-unknown-unknown` target installed as well.
 
 You can check that via:
@@ -49,9 +50,28 @@ making any changes. Go into the
 # this will produce a wasm build in ./target/wasm32-unknown-unknown/release/YOUR_NAME_HERE.wasm
 cargo wasm
 
-# this runs unit tests and integration tests
+# this runs unit tests with helpful backtraces
+RUST_BACKTRACES=1 cargo unit-test
+RUST_BACKTRACES=1 cargo test -lib --features backtraces
+
+# this runs integration tests with cranelift backend (uses rust stable)
 cargo test
+
+# this runs integration tests with singlepass backend (needs rust nightly)
+cargo test --no-default-features --features singlepass
 ```
+
+The wasmer engine, embedded in `cosmwasm-vm` supports multiple backends: 
+singlepass and cranelift. Singlepass has fast compile times and slower run times,
+and supportes gas metering. It also requires rust `nightly`. This is used as default
+when embedding `cosmwasm-vm` in `go-cosmwasm` and is needed to use if you want to
+check the gas usage. 
+
+However, when just building contacts, if you don't want to worry about installing
+two rust toolchains, you can run all tests with cranelift. The integration tests
+may take a small bit longer, but the results will be the same. The only difference 
+is that you can not check gas usage here, so if you wish to optimize gas, you must
+switch to nightly and run with cranelift.
 
 ### Understanding the tests
 
@@ -76,11 +96,22 @@ wasm also behaves as desired in the real system.
 ## Preparing the wasm for production
 
 Before we upload it to a chain, we need to ensure the smallest output size possible,
-as this will be included in the body of a transaction.
+as this will be included in the body of a transaction. We also want to have a
+reproducible build process, so third parties can verify that the uploaded wasm
+code did indeed come from the claimed rust code.
 
-**TODO**
+To solve both these issues, we have produced `cosmwasm-opt`, a docker image to
+produce an extremely small build output in a consistent manner. To use it,
 
-* Document how to set up and use `wasm-gc`.
-* Other docs? `wasm-bindgen`?
+Linux: `docker run --rm -u $(id -u):$(id -g) -v $(pwd):/code confio/cosmwasm-opt:0.4.1`
 
-Currently the sample app weighs in at 172kB compiled wasm, but we hope to reduce that.
+This produces a `contract.wasm` file in the current directory (which must be the root
+directory of your rust project, the one with `Cargo.toml` inside). The current sample
+contract compiles down to around 48kB wasm file.
+
+Note this will take a while, as it doesn't share the cargo registry nor the incremental
+compilation cache with your host system, in order to provide the most consistent setup.
+
+We also track the versions of cosmwasm that we aim for compatibility. The most important
+aspect is the same version of wasm-pack and wasm-bindgen. For 0.4.1 we are tied to
+wasm-pack 0.8.1, wasm-bindgen 0.2.53, and rust 1.38.
