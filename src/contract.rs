@@ -9,26 +9,39 @@ use cosmwasm::serde::{from_slice, to_vec};
 use cosmwasm::storage::Storage;
 use cosmwasm::types::{CosmosMsg, Params, Response};
 
-#[derive(Serialize, Deserialize, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct InitMsg {
     pub verifier: String,
     pub beneficiary: String,
 }
 
-#[derive(Serialize, Deserialize, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct State {
     pub verifier: String,
     pub beneficiary: String,
     pub funder: String,
 }
 
-#[derive(Serialize, Deserialize, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct HandleMsg {}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+#[serde(rename_all = "lowercase")]
+pub enum QueryMsg {
+    Raw(RawQuery),
+}
+
+// raw_query is a helper to generate a serialized format of a raw_query
+// meant for test code and integration tests
+pub fn raw_query(key: &[u8]) -> Result<Vec<u8>> {
+    let key = from_utf8(key).context(Utf8Err {})?.to_string();
+    to_vec(&QueryMsg::Raw(RawQuery { key })).context(SerializeErr { kind: "QueryMsg" })
+}
 
 pub static CONFIG_KEY: &[u8] = b"config";
 
 pub fn init<T: Storage>(store: &mut T, params: Params, msg: Vec<u8>) -> Result<Response> {
-    let msg: InitMsg = from_slice(&msg).context(ParseErr {})?;
+    let msg: InitMsg = from_slice(&msg).context(ParseErr { kind: "InitMsg" })?;
     store.set(
         CONFIG_KEY,
         &to_vec(&State {
@@ -36,23 +49,23 @@ pub fn init<T: Storage>(store: &mut T, params: Params, msg: Vec<u8>) -> Result<R
             beneficiary: msg.beneficiary,
             funder: params.message.signer,
         })
-            .context(SerializeErr {})?,
+            .context(SerializeErr { kind: "State" })?,
     );
     Ok(Response::default())
 }
 
 pub fn handle<T: Storage>(store: &mut T, params: Params, _: Vec<u8>) -> Result<Response> {
     let data = store.get(CONFIG_KEY).context(ContractErr {
-        msg: "uninitialized data".to_string(),
+        msg: "uninitialized data",
     })?;
-    let state: State = from_slice(&data).context(ParseErr {})?;
+    let state: State = from_slice(&data).context(ParseErr { kind: "State" })?;
 
     if params.message.signer == state.verifier {
         let res = Response {
             messages: vec![CosmosMsg::Send {
                 from_address: params.contract.address,
                 to_address: state.beneficiary,
-                amount: params.contract.balance,
+                amount: params.contract.balance.unwrap_or_default(),
             }],
             log: Some("released funds!".to_string()),
             data: None,
@@ -60,6 +73,13 @@ pub fn handle<T: Storage>(store: &mut T, params: Params, _: Vec<u8>) -> Result<R
         Ok(res)
     } else {
         Unauthorized {}.fail()
+    }
+}
+
+pub fn query<T: Storage>(store: &T, msg: Vec<u8>) -> Result<QueryResponse> {
+    let msg: QueryMsg = from_slice(&msg).context(ParseErr { kind: "QueryMsg" })?;
+    match msg {
+        QueryMsg::Raw(raw) => perform_raw_query(store, raw),
     }
 }
 
