@@ -51,14 +51,17 @@ making any changes. Go into the
 cargo wasm
 
 # this runs unit tests with helpful backtraces
-RUST_BACKTRACES=1 cargo unit-test
-RUST_BACKTRACES=1 cargo test -lib --features backtraces
+RUST_BACKTRACE=1 cargo unit-test
+RUST_BACKTRACE=1 cargo test --lib --features backtraces
 
 # this runs integration tests with cranelift backend (uses rust stable)
 cargo test
 
 # this runs integration tests with singlepass backend (needs rust nightly)
 cargo test --no-default-features --features singlepass
+
+# auto-generate json schema
+cargo schema
 ```
 
 The wasmer engine, embedded in `cosmwasm-vm` supports multiple backends: 
@@ -100,6 +103,10 @@ information to use it. We need to expose the schema for the expected messages to
 clients. You can generate this schema by calling `cargo schema`, which will output
 4 files in `./schema`, corresponding to the 3 message types the contract accepts,
 as well as the internal `State`.
+
+These files are in standard json-schema format, which should be usable by various
+client side tools, either to auto-generate codecs, or just to validate incoming
+json wrt. the defined schema.
 
 ## Preparing the wasm for production
 
