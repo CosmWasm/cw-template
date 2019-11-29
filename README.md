@@ -93,6 +93,14 @@ both the logic and the tests. Once the code is finalized, you can copy over some
 tests into the integration.rs and make the needed changes. This ensures the compiled
 wasm also behaves as desired in the real system.
 
+## Generating JSON Schema
+
+While the wasm calls (`init`, `handle`, `query`) accept JSON, this is not enough
+information to use it. We need to expose the schema for the expected messages to the
+clients. You can generate this schema by calling `cargo schema`, which will output
+4 files in `./schema`, corresponding to the 3 message types the contract accepts,
+as well as the internal `State`.
+
 ## Preparing the wasm for production
 
 Before we upload it to a chain, we need to ensure the smallest output size possible,

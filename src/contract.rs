@@ -1,3 +1,6 @@
+use std::str::from_utf8;
+
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use snafu::{OptionExt, ResultExt};
 
@@ -6,20 +9,20 @@ use cosmwasm::serde::{from_slice, to_vec};
 use cosmwasm::storage::Storage;
 use cosmwasm::types::{CosmosMsg, Params, Response};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, JsonSchema)]
 pub struct InitMsg {
     pub verifier: String,
     pub beneficiary: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, JsonSchema)]
 pub struct State {
     pub verifier: String,
     pub beneficiary: String,
     pub funder: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, JsonSchema)]
 pub struct HandleMsg {}
 
 pub static CONFIG_KEY: &[u8] = b"config";
