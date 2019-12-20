@@ -23,8 +23,17 @@ jobs:
           env: RUST_BACKTRACE=1
           command: cargo test --locked
       - run:
-          name: Ensure schema generation works
-          command: cargo schema
+          name: Build and run schema generator
+          command: cargo schema --locked
+      - run:
+          name: Ensure checked-in schemas are up-to-date
+          command: |
+            CHANGES_IN_REPO=$(git status --porcelain)
+            if [[ -n "$CHANGES_IN_REPO" ]]; then
+              echo "Repository is dirty. Showing 'git status' and 'git diff' for debugging now:"
+              git status && git diff
+              exit 1
+            fi
       - save_cache:
           paths:
             - /usr/local/cargo/registry
