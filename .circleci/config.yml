@@ -23,8 +23,8 @@ jobs:
           env: RUST_BACKTRACE=1
           command: cargo test --locked
       - run:
-          name: Ensure schema generation works
-          command: cargo schema
+          name: Build and run schema generator
+          command: cargo schema --locked
       - save_cache:
           paths:
             - /usr/local/cargo/registry
