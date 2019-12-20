@@ -29,6 +29,6 @@ fn main() {
 fn export_schema(schema: &RootSchema, dir: &PathBuf, name: &str) -> () {
     let path = dir.join(name);
     let json = serde_json::to_string_pretty(schema).unwrap();
-    write(&path, json.as_bytes()).unwrap();
+    write(&path, json + "\n").unwrap();
     println!("{}", path.to_str().unwrap());
 }
