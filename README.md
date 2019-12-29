@@ -15,7 +15,7 @@ And you need to have the `wasm32-unknown-unknown` target installed as well.
 
 You can check that via:
 
-```shell script
+```sh
 rustc --version
 cargo --version
 rustup target list --installed
@@ -27,14 +27,14 @@ You will also need to have
 [cargo generate](https://github.com/ashleygwilliams/cargo-generate) installed.
 Unless you did that before, run this line now:
 
-```shell script
+```sh
 cargo install cargo-generate --features vendored-openssl
 ```
 
 Now that the prerequisites are over, you can create your new contract.
 Go to the folder in which you want to place it and run:
 
-```shell script
+```sh
 cargo generate --git https://github.com/confio/cosmwasm-template.git --name YOUR_NAME_HERE
 ```
 
@@ -46,7 +46,7 @@ containing a simple working contract and build system that you can customize.
 Now that you created your custom contract, make sure you can compile and run it before
 making any changes. Go into the
 
-```shell script
+```sh
 # this will produce a wasm build in ./target/wasm32-unknown-unknown/release/YOUR_NAME_HERE.wasm
 cargo wasm
 
