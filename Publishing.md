@@ -106,15 +106,3 @@ Once you have published your package, people can now find it by
 But that isn't exactly the simplest way. To make things easier and help
 keep the ecosystem together, we suggest making a PR to add your package
 to the [`cawesome-wasm`](https://github.com/cosmwasm/cawesome-wasm) list.
-
-## Importing
-
-TODO: downloading published crates
-
-### Verifying
-
-Simple command to validate the hash, etc
-
-### Reviewing
-
-TODO: crev
