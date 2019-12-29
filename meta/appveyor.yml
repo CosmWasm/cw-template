@@ -14,6 +14,9 @@ environment:
     - TARGET: x86_64-pc-windows-msvc
       CHANNEL: nightly
 
+cache:
+  - '%USERPROFILE%\.cargo\'
+
 install:
   - appveyor-retry appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
   - rustup-init.exe --default-host %TARGET% --default-toolchain %CHANNEL% -y
