@@ -23,6 +23,7 @@ install:
   - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin
   - rustc --version
   - cargo --version
+  - rustup target add wasm32-unknown-unknown
   - cargo install cargo-generate --features vendored-openssl
 
 build_script:
