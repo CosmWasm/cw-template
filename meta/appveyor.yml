@@ -26,17 +26,14 @@ install:
   - cargo install cargo-generate --features vendored-openssl
 
 build_script:
-  - cargo generate --git . --name test-generation-in-ci
-  - dir
+  - cd ..
+  - cargo generate --git cosmwasm-template --name test-generation-in-ci
   - cd test-generation-in-ci
+  - dir
   - cargo unit-test
   - cargo wasm
   - cargo test
   - cargo schema
-  - cd ..
-
-after_build:
-  - git status
 
 # whitelist long living branches
 branches:
