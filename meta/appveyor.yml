@@ -26,9 +26,9 @@ install:
   - cargo install cargo-generate --features vendored-openssl
 
 build_script:
-  - cargo generate --git . --name TestGenerationInCi
+  - cargo generate --git . --name test-generation-in-ci
   - dir
-  - cd TestGenerationInCi
+  - cd test-generation-in-ci
   - cargo unit-test
   - cargo wasm
   - cargo test
