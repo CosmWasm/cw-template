@@ -34,3 +34,8 @@ build_script:
 
 after_build:
   - git status
+
+# whitelist long living branches
+branches:
+  only:
+    - master
