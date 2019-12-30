@@ -12,7 +12,8 @@ image: Ubuntu
 environment:
   matrix:
     - TOOLCHAIN: stable
-    - TOOLCHAIN: nightly
+# Deactivated for now
+#    - TOOLCHAIN: nightly
 
 cache:
   - '~/.rustup'
