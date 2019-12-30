@@ -47,13 +47,18 @@ install:
       }
 
 build_script:
+  # we must check out the original branch locally, not the virtual merge
+  # by default cargo generate will check out master and there is no way to specify the virtual merge commit, only a branch
+  # so let's just pull it back to the branch we want to test (must be available locally for the later generate command to work)
+  - echo %APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH%
+  - git checkout %APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH%
   - cd ..
   - ps: |
       if (Test-Path 'test-generation-in-ci/target') {
         Move-Item test-generation-in-ci/target target-cache;
         Remove-Item -path test-generation-in-ci -recurse
       }
-  - cargo generate --git cosmwasm-template --name test-generation-in-ci
+  - cargo generate --git cosmwasm-template --name test-generation-in-ci --branch %APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH%
   - ps: |
       if (Test-Path 'target-cache') {
         Move-Item target-cache test-generation-in-ci/target
@@ -62,7 +67,8 @@ build_script:
   - dir
   - cargo unit-test
   - cargo wasm
-  - cargo test
+  - cargo integration-test
+#  - cargo integration-test --no-default-features --features singlepass
   - cargo schema
 
 # whitelist long living branches

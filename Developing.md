@@ -14,7 +14,7 @@ And you need to have the `wasm32-unknown-unknown` target installed as well.
 
 You can check that via:
 
-```shell script
+```sh
 rustc --version
 cargo --version
 rustup target list --installed
@@ -33,13 +33,12 @@ cargo wasm
 
 # this runs unit tests with helpful backtraces
 RUST_BACKTRACE=1 cargo unit-test
-RUST_BACKTRACE=1 cargo test --lib --features backtraces
 
 # this runs integration tests with cranelift backend (uses rust stable)
-cargo test
+cargo integration-test
 
 # this runs integration tests with singlepass backend (needs rust nightly)
-cargo test --no-default-features --features singlepass
+cargo integration-test --no-default-features --features singlepass
 
 # auto-generate json schema
 cargo schema
@@ -61,25 +60,28 @@ switch to nightly and run with cranelift.
 
 The main code is in `src/contract.rs` and the unit tests there run in pure rust,
 which makes them very quick to execute and give nice output on failures, especially
-if you do `RUST_BACKTRACE=1 cargo test`.
+if you do `RUST_BACKTRACE=1 cargo unit-test`.
 
-However, we don't just want to test the logic rust, but also the compiled wasm artifact
-inside a vm. You can look in `tests/integration.rs` to see some examples there. They
-load the wasm binary into the vm and call the contract externally. Effort has been
+However, we don't just want to test the logic rust, but also the compiled Wasm artifact
+inside a VM. You can look in `tests/integration.rs` to see some examples there. They
+load the Wasm binary into the vm and call the contract externally. Effort has been
 made that the syntax is very similar to the calls in the native rust contract and
 quite easy to code. In fact, usually you can just copy a few unit tests and modify
 a few lines to make an integration test (this should get even easier in a future release).
+
+To run the latest integration tests, you need to explicitely rebuild the Wasm file with
+`cargo wasm` and then run `cargo integration-tests`.
 
 We consider testing critical for anything on a blockchain, and recommend to always keep
 the tests up to date. While doing active development, it is often simplest to disable
 the integration tests completely and iterate rapidly on the code in `contract.rs`,
 both the logic and the tests. Once the code is finalized, you can copy over some unit
 tests into the integration.rs and make the needed changes. This ensures the compiled
-wasm also behaves as desired in the real system.
+Wasm also behaves as desired in the real system.
 
 ## Generating JSON Schema
 
-While the wasm calls (`init`, `handle`, `query`) accept JSON, this is not enough
+While the Wasm calls (`init`, `handle`, `query`) accept JSON, this is not enough
 information to use it. We need to expose the schema for the expected messages to the
 clients. You can generate this schema by calling `cargo schema`, which will output
 4 files in `./schema`, corresponding to the 3 message types the contract accepts,
@@ -89,11 +91,11 @@ These files are in standard json-schema format, which should be usable by variou
 client side tools, either to auto-generate codecs, or just to validate incoming
 json wrt. the defined schema.
 
-## Preparing the wasm for production
+## Preparing the Wasm bytecode for production
 
 Before we upload it to a chain, we need to ensure the smallest output size possible,
 as this will be included in the body of a transaction. We also want to have a
-reproducible build process, so third parties can verify that the uploaded wasm
+reproducible build process, so third parties can verify that the uploaded Wasm
 code did indeed come from the claimed rust code.
 
 To solve both these issues, we have produced `cosmwasm-opt`, a docker image to
@@ -103,7 +105,7 @@ Linux: `docker run --rm -u $(id -u):$(id -g) -v $(pwd):/code confio/cosmwasm-opt
 
 This produces a `contract.wasm` file in the current directory (which must be the root
 directory of your rust project, the one with `Cargo.toml` inside). The current sample
-contract compiles down to around 48kB wasm file.
+contract compiles down to around 60kB Wasm file.
 
 Note this will take a while, as it doesn't share the cargo registry nor the incremental
 compilation cache with your host system, in order to provide the most consistent setup.

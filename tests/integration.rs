@@ -7,7 +7,7 @@ use {{crate_name}}::contract::{CONFIG_KEY, HandleMsg, InitMsg, State, raw_query}
 /**
 This integration test tries to run and call the generated wasm.
 It depends on a release build being available already. You can create that with: `cargo wasm`
-Then running `cargo test` will validate we can properly call into that generated data.
+Then running `cargo integration-test` will validate we can properly call into that generated data.
 
 You can copy the code from unit tests here verbatim, then make a few changes:
 
