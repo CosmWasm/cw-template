@@ -1,6 +1,6 @@
 pub mod contract;
 
-/** Below we expose wasm exports **/
+/** Below we expose wasm exports * **/
 #[cfg(target_arch = "wasm32")]
 pub use cosmwasm::exports::{allocate, deallocate};
 

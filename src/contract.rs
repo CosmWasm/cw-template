@@ -29,7 +29,7 @@ pub enum HandleMsg {
 #[serde(rename_all = "lowercase")]
 pub enum QueryMsg {
     // GetCount returns the current count as a json-encoded number
-    GetCount{},
+    GetCount {},
 }
 
 // We define a custom struct for each query response
@@ -51,7 +51,7 @@ pub fn init<S: Storage, A: Api>(
             count: msg.count,
             owner: params.message.signer,
         })
-            .context(SerializeErr { kind: "State" })?,
+        .context(SerializeErr { kind: "State" })?,
     );
     Ok(Response::default())
 }
@@ -115,7 +115,9 @@ fn query_count<S: Storage, A: Api>(deps: &Extern<S, A>) -> Result<Vec<u8>> {
     })?;
     let state: State = from_slice(&data).context(ParseErr { kind: "State" })?;
     let resp = CountResponse { count: state.count };
-    to_vec(&resp).context(SerializeErr { kind: "CountResponse" })
+    to_vec(&resp).context(SerializeErr {
+        kind: "CountResponse",
+    })
 }
 
 #[cfg(test)]
@@ -147,7 +149,12 @@ mod tests {
         let mut deps = dependencies(20);
 
         let msg = InitMsg { count: 17 };
-        let params = mock_params(&deps.api, "creator", &coin("2", "token"), &coin("2", "token"));
+        let params = mock_params(
+            &deps.api,
+            "creator",
+            &coin("2", "token"),
+            &coin("2", "token"),
+        );
         let _res = init(&mut deps, params, msg).unwrap();
 
         // beneficiary can release it
@@ -166,7 +173,12 @@ mod tests {
         let mut deps = dependencies(20);
 
         let msg = InitMsg { count: 17 };
-        let params = mock_params(&deps.api, "creator", &coin("2", "token"), &coin("2", "token"));
+        let params = mock_params(
+            &deps.api,
+            "creator",
+            &coin("2", "token"),
+            &coin("2", "token"),
+        );
         let _res = init(&mut deps, params, msg).unwrap();
 
         // beneficiary can release it
@@ -174,13 +186,13 @@ mod tests {
         let msg = HandleMsg::Reset { count: 5 };
         let res = handle(&mut deps, unauth_params, msg);
         match res {
-            Err(Error::Unauthorized{..}) => {},
+            Err(Error::Unauthorized { .. }) => {}
             _ => panic!("Must return unauthorized error"),
         }
 
         // only the original creator can reset the counter
         let auth_params = mock_params(&deps.api, "creator", &coin("2", "token"), &[]);
-        let msg = HandleMsg::Reset {count: 5};
+        let msg = HandleMsg::Reset { count: 5 };
         let _res = handle(&mut deps, auth_params, msg).unwrap();
 
         // should now be 5
