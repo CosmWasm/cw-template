@@ -7,14 +7,18 @@
 # location. Furthermore it allows us to ship a Circle CI and Travis config
 # generated for the resulting project.
 
-environment:
-  matrix:
-    - TARGET: x86_64-pc-windows-msvc
-      CHANNEL: stable
+# I'm having a hard time with the caching below and variable interpolation
+# Free free to add later and update the install script, but make sure caching works
+
+#environment:
+#  matrix:
 #    - TARGET: x86_64-pc-windows-msvc
-#      CHANNEL: nightly
+#      CHANNEL: stable
+##    - TARGET: x86_64-pc-windows-msvc
+##      CHANNEL: nightly
 
 cache:
+  - 'C:\Users\appveyor\.rustup'
   - 'C:\Users\appveyor\.cargo\bin'
   - 'C:\Users\appveyor\.cargo\registry'
   - 'C:\projects\test-generation-in-ci\target\debug\.fingerprint -> Cargo.lock, Cargo.toml'
@@ -25,14 +29,12 @@ cache:
   - 'C:\projects\test-generation-in-ci\target\wasm32-unknown-unknown\release\deps -> Cargo.lock, Cargo.toml'
 
 install:
-  - echo hi
-  - cmd: if not exist 'C:\Users\appveyor\.cargo\bin\rustc' ( appveyor-retry appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe && rustup-init.exe --default-host %TARGET% --default-toolchain %CHANNEL% -y )
+  - ps: if (-not (Test-Path 'C:\Users\appveyor\.cargo\bin\rustc.exe')) { appveyor-retry appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe ; .\rustup-init.exe --profile minimal --default-host x86_64-pc-windows-msvc --default-toolchain stable -y; echo okay }
   - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin
-  - dir C:\Users\appveyor\.cargo\bin
   - rustc --version
   - cargo --version
   - rustup target add wasm32-unknown-unknown
-  - cmd: if not exist 'C:\Users\appveyor\.cargo\bin\cargo-generate' ( cargo install cargo-generate --features vendored-openssl )
+  - ps: if (-not (Test-Path 'C:\Users\appveyor\.cargo\bin\cargo-generate.exe')) { cargo install cargo-generate --features vendored-openssl; echo okay }
 
 build_script:
   - cd ..
