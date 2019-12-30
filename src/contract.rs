@@ -5,10 +5,9 @@ use serde::{Deserialize, Serialize};
 use snafu::{OptionExt, ResultExt};
 
 use cosmwasm::errors::{ContractErr, ParseErr, Result, SerializeErr, Unauthorized, Utf8Err};
-use cosmwasm::query::perform_raw_query;
 use cosmwasm::serde::{from_slice, to_vec};
-use cosmwasm::storage::Storage;
-use cosmwasm::types::{Params, QueryResponse, RawQuery, Response};
+use cosmwasm::traits::{Api, Extern, Storage};
+use cosmwasm::types::{Params, Response};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct InitMsg {
@@ -31,20 +30,16 @@ pub enum HandleMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "lowercase")]
 pub enum QueryMsg {
-    Raw(RawQuery),
-}
-
-// raw_query is a helper to generate a serialized format of a raw_query
-// meant for test code and integration tests
-pub fn raw_query(key: &[u8]) -> Result<Vec<u8>> {
-    let key = from_utf8(key).context(Utf8Err {})?.to_string();
-    to_vec(&QueryMsg::Raw(RawQuery { key })).context(SerializeErr { kind: "QueryMsg" })
+    // TODO: add one here
 }
 
 pub static CONFIG_KEY: &[u8] = b"config";
 
-pub fn init<T: Storage>(store: &mut T, params: Params, msg: Vec<u8>) -> Result<Response> {
-    let msg: InitMsg = from_slice(&msg).context(ParseErr { kind: "InitMsg" })?;
+pub fn init<S: Storage, A: Api>(
+    deps: &mut Extern<S, A>,
+    params: Params,
+    msg: InitMsg,
+) -> Result<Response> {
     store.set(
         CONFIG_KEY,
         &to_vec(&State {
@@ -56,8 +51,11 @@ pub fn init<T: Storage>(store: &mut T, params: Params, msg: Vec<u8>) -> Result<R
     Ok(Response::default())
 }
 
-pub fn handle<T: Storage>(store: &mut T, params: Params, msg: Vec<u8>) -> Result<Response> {
-    let msg: HandleMsg = from_slice(&msg).context(ParseErr { kind: "HandleMsg" })?;
+pub fn handle<S: Storage, A: Api>(
+    deps: &mut Extern<S, A>,
+    params: Params,
+    msg: HandleMsg,
+) -> Result<Response> {
     let data = store.get(CONFIG_KEY).context(ContractErr {
         msg: "uninitialized data",
     })?;
@@ -100,11 +98,11 @@ pub fn try_reset<T: Storage>(
     }
 }
 
-pub fn query<T: Storage>(store: &T, msg: Vec<u8>) -> Result<QueryResponse> {
-    let msg: QueryMsg = from_slice(&msg).context(ParseErr { kind: "QueryMsg" })?;
-    match msg {
-        QueryMsg::Raw(raw) => perform_raw_query(store, raw),
-    }
+pub fn query<S: Storage, A: Api>(
+    deps: &Extern<S, A>,
+    msg: QueryMsg,
+) -> Result<QueryResponse> {
+    match msg {}
 }
 
 #[cfg(test)]
