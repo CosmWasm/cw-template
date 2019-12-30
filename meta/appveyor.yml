@@ -19,7 +19,7 @@ cache:
   - '~/.cargo'
 
 install:
-  - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain=$TOOLCHAIN -y
+  - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --profile minimal --default-toolchain $TOOLCHAIN -y
   - source $HOME/.cargo/env
   - rustc --version
   - cargo --version
