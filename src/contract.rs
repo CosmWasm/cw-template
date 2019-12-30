@@ -130,14 +130,15 @@ mod tests {
         let mut deps = dependencies(20);
 
         let msg = InitMsg { count: 17 };
-        let params = mock_params("creator", &coin("1000", "earth"), &[]);
+        let params = mock_params(&deps.api, "creator", &coin("1000", "earth"), &[]);
+
         // we can just call .unwrap() to assert this was a success
         let res = init(&mut deps, params, msg).unwrap();
         assert_eq!(0, res.messages.len());
 
         // it worked, let's query the state
         let mut res = query(&deps, QueryMsg::GetCount {}).unwrap();
-        let value: CountResponse = from_slice(&res);
+        let value: CountResponse = from_slice(&res).unwrap();
         assert_eq!(17, value.count);
     }
 
@@ -146,17 +147,17 @@ mod tests {
         let mut deps = dependencies(20);
 
         let msg = InitMsg { count: 17 };
-        let params = mock_params("creator", &coin("2", "token"), &coin("2", "token"));
-        let _res = init(&mut store, params, msg).unwrap();
+        let params = mock_params(&deps.api, "creator", &coin("2", "token"), &coin("2", "token"));
+        let _res = init(&mut deps, params, msg).unwrap();
 
         // beneficiary can release it
-        let params = mock_params("anyone", &coin("2", "token"), &[]);
+        let params = mock_params(&deps.api, "anyone", &coin("2", "token"), &[]);
         let msg = HandleMsg::Increment {};
-        let _res = handle(&mut store, params, msg).unwrap();
+        let _res = handle(&mut deps, params, msg).unwrap();
 
         // should increase counter by 1
         let mut res = query(&deps, QueryMsg::GetCount {}).unwrap();
-        let value: CountResponse = from_slice(&res);
+        let value: CountResponse = from_slice(&res).unwrap();
         assert_eq!(18, value.count);
     }
 
@@ -165,26 +166,26 @@ mod tests {
         let mut deps = dependencies(20);
 
         let msg = InitMsg { count: 17 };
-        let params = mock_params("creator", &coin("2", "token"), &coin("2", "token"));
-        let _res = init(&mut store, params, msg).unwrap();
+        let params = mock_params(&deps.api, "creator", &coin("2", "token"), &coin("2", "token"));
+        let _res = init(&mut deps, params, msg).unwrap();
 
         // beneficiary can release it
-        let unauth_params = mock_params("anyone", &coin("2", "token"), &[]);
+        let unauth_params = mock_params(&deps.api, "anyone", &coin("2", "token"), &[]);
         let msg = HandleMsg::Reset { count: 5 };
-        let res = handle(&mut store, unauth_params, msg);
+        let res = handle(&mut deps, unauth_params, msg);
         match res {
             Err(Error::Unauthorized{..}) => {},
             _ => panic!("Must return unauthorized error"),
         }
 
         // only the original creator can reset the counter
-        let auth_params = mock_params("creator", &coin("2", "token"), &[]);
+        let auth_params = mock_params(&deps.api, "creator", &coin("2", "token"), &[]);
         let msg = HandleMsg::Reset {count: 5};
-        let _res = handle(&mut store, auth_params, msg).unwrap();
+        let _res = handle(&mut deps, auth_params, msg).unwrap();
 
         // should now be 5
         let mut res = query(&deps, QueryMsg::GetCount {}).unwrap();
-        let value: CountResponse = from_slice(&res);
+        let value: CountResponse = from_slice(&res).unwrap();
         assert_eq!(18, value.count);
     }
 }
