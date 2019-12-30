@@ -1,11 +1,10 @@
 use cosmwasm::mock::mock_params;
 use cosmwasm::serde::from_slice;
-use cosmwasm::traits::{Api, ReadonlyStorage};
-use cosmwasm::types::{coin, ContractResult, CosmosMsg, QueryResult};
+use cosmwasm::types::{coin, ContractResult};
 
 use cosmwasm_vm::testing::{handle, init, mock_instance, query};
 
-use {{crate_name}}::contract::{CONFIG_KEY, CountResponse HandleMsg, InitMsg, QueryMsg, State};
+use {{crate_name}}::contract::{CountResponse, HandleMsg, InitMsg, QueryMsg};
 
 /**
 This integration test tries to run and call the generated wasm.
@@ -62,7 +61,7 @@ let res = init(&mut deps, params, msg).unwrap();
 assert_eq!(0, res.messages.len());
 
 // it worked, let's query the state
-let mut res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
+let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
 let value: CountResponse = from_slice(&res).unwrap();
 assert_eq!(17, value.count);
 }
@@ -81,7 +80,7 @@ let msg = HandleMsg::Increment {};
 let _res = handle(&mut deps, params, msg).unwrap();
 
 // should increase counter by 1
-let mut res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
+let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
 let value: CountResponse = from_slice(&res).unwrap();
 assert_eq!(18, value.count);
 }
@@ -109,7 +108,7 @@ let msg = HandleMsg::Reset {count: 5};
 let _res = handle(&mut deps, auth_params, msg).unwrap();
 
 // should now be 5
-let mut res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
+let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
 let value: CountResponse = from_slice(&res).unwrap();
 assert_eq!(5, value.count);
 }
