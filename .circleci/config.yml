@@ -21,7 +21,7 @@ jobs:
       - run:
           name: Integration tests
           env: RUST_BACKTRACE=1
-          command: cargo test --locked
+          command: cargo integration-test --locked
       - run:
           name: Build and run schema generator
           command: cargo schema --locked

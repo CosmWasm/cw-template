@@ -62,7 +62,8 @@ build_script:
   - dir
   - cargo unit-test
   - cargo wasm
-  - cargo test
+  - cargo integration-test
+  - cargo integration-test --no-default-features --features singlepass
   - cargo schema
 
 # whitelist long living branches
