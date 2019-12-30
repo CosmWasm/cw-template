@@ -16,8 +16,8 @@ environment:
 #    - TOOLCHAIN: nightly
 
 cache:
-  - '~/.rustup'
-  - '~/.cargo'
+  - $HOME/.rustup
+  - $HOME/.cargo
 
 install:
   - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --profile minimal --default-toolchain $TOOLCHAIN -y
