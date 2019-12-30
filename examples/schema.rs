@@ -22,6 +22,9 @@ fn main() {
 
     let schema = schema_for!(State);
     export_schema(&schema, &pwd, "state.json");
+
+    let schema = schema_for!(CountResponse);
+    export_schema(&schema, &pwd, "count_response.json");
 }
 
 // panics if any error writing out the schema
