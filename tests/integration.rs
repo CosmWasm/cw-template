@@ -1,11 +1,11 @@
 use cosmwasm::mock::mock_params;
 use cosmwasm::serde::from_slice;
 use cosmwasm::traits::{Api, ReadonlyStorage};
-use cosmwasm::types::{coin, CosmosMsg, HumanAddr, QueryResult};
+use cosmwasm::types::{coin, ContractResult, CosmosMsg, QueryResult};
 
 use cosmwasm_vm::testing::{handle, init, mock_instance, query};
 
-use {{crate_name}}::contract::{CONFIG_KEY, HandleMsg, InitMsg, State};
+use {{crate_name}}::contract::{CONFIG_KEY, CountResponse HandleMsg, InitMsg, QueryMsg, State};
 
 /**
 This integration test tries to run and call the generated wasm.
@@ -29,6 +29,18 @@ To
         //...
     });
 4. Anywhere you see query(&deps, ...) you must replace it with query(&mut deps, ...)
+5. When matching on error codes, you can not use Error types, but rather must use strings:
+     match res {
+       Err(Error::Unauthorized{..}) => {},
+       _ => panic!("Must return unauthorized error"),
+     }
+   becomes:
+     match res {
+        ContractResult::Err(msg) => assert_eq!(msg, "Unauthorized"),
+        _ => panic!("Expected error"),
+     }
+
+
 
 **/
 
@@ -87,8 +99,8 @@ let unauth_params = mock_params(&deps.api, "anyone", &coin("2", "token"), &[]);
 let msg = HandleMsg::Reset { count: 5 };
 let res = handle(&mut deps, unauth_params, msg);
 match res {
-Err(Error::Unauthorized{..}) => {},
-_ => panic!("Must return unauthorized error"),
+ContractResult::Err(msg) => assert_eq!(msg, "Unauthorized"),
+_ => panic!("Expected error"),
 }
 
 // only the original creator can reset the counter

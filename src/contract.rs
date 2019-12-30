@@ -137,7 +137,7 @@ mod tests {
         assert_eq!(0, res.messages.len());
 
         // it worked, let's query the state
-        let mut res = query(&deps, QueryMsg::GetCount {}).unwrap();
+        let res = query(&deps, QueryMsg::GetCount {}).unwrap();
         let value: CountResponse = from_slice(&res).unwrap();
         assert_eq!(17, value.count);
     }
@@ -156,7 +156,7 @@ mod tests {
         let _res = handle(&mut deps, params, msg).unwrap();
 
         // should increase counter by 1
-        let mut res = query(&deps, QueryMsg::GetCount {}).unwrap();
+        let res = query(&deps, QueryMsg::GetCount {}).unwrap();
         let value: CountResponse = from_slice(&res).unwrap();
         assert_eq!(18, value.count);
     }
@@ -184,7 +184,7 @@ mod tests {
         let _res = handle(&mut deps, auth_params, msg).unwrap();
 
         // should now be 5
-        let mut res = query(&deps, QueryMsg::GetCount {}).unwrap();
+        let res = query(&deps, QueryMsg::GetCount {}).unwrap();
         let value: CountResponse = from_slice(&res).unwrap();
         assert_eq!(5, value.count);
     }
