@@ -99,17 +99,45 @@ reproducible build process, so third parties can verify that the uploaded Wasm
 code did indeed come from the claimed rust code.
 
 To solve both these issues, we have produced `cosmwasm-opt`, a docker image to
-produce an extremely small build output in a consistent manner. To use it,
+produce an extremely small build output in a consistent manner. The suggest way
+to run it is this:
 
-Linux: `docker run --rm -u $(id -u):$(id -g) -v $(pwd):/code confio/cosmwasm-opt:0.4.1`
+```sh
+docker run --rm -v $(pwd):/code \
+  --mount type=volume,source=$(basename $(pwd))_cache,target=/code/target \
+  --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
+  confio/cosmwasm-opt:0.6.0
+```
+
+We must mount the contract code to `/code`. You can use a absolute path instead
+of `$(pwd)` if you don't want to `cd` to the directory first. The other two
+volumes are nice for speedup. Mounting `/code/target` in particular is useful
+to avoid docker overwriting your local dev files with root permissions.
+Note the `/code/target` cache is unique for each contract being compiled to limit
+interference, while the registry cache is global.
+
+This is rather slow compared to local compilations, especially the first compile
+of a given contract. The use of the two volume caches is very useful to speed up
+following compiles of the same contract.
 
 This produces a `contract.wasm` file in the current directory (which must be the root
-directory of your rust project, the one with `Cargo.toml` inside). The current sample
-contract compiles down to around 60kB Wasm file.
+directory of your rust project, the one with `Cargo.toml` inside). As well as
+`hash.txt` containing the Sha256 hash of `contract.wasm`, and it will rebuild
+your schema files as well.
 
-Note this will take a while, as it doesn't share the cargo registry nor the incremental
-compilation cache with your host system, in order to provide the most consistent setup.
+### Testing production build
 
-We also track the versions of cosmwasm that we aim for compatibility. The most important
-aspect is the same version of wasm-pack and wasm-bindgen. For 0.4.1 we are tied to
-wasm-pack 0.8.1, wasm-bindgen 0.2.53, and rust 1.38.
+Once we have this compressed `contract.wasm`, we may want to ensure it is actually
+doing everything it is supposed to (as it is about 4% of the original size).
+If you update the "WASM" line in `tests/integration.rs`, it will run the integration
+steps on the optimized build, not just the normal build. I have never seen a different
+behavior, but it is nice to verify sometimes.
+
+```rust
+static WASM: &[u8] = include_bytes!("../contract.wasm");
+```
+
+Note that this is the same (deterministic) code you will be uploading to
+a blockchain to test it out, as we need to shrink the size and produce a
+clear mapping from wasm hash back to the source code.
+
