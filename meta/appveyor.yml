@@ -1,0 +1,42 @@
+# This CI configuration tests the cosmwasm-template repository itself,
+# not the resulting project. We want to ensure that
+# 1. the template to project generation works
+# 2. the template files are up to date
+#
+# We chose Appveyor for this task as it allows us to use an arbitrary config
+# location. Furthermore it allows us to ship a Circle CI and Travis config
+# generated for the resulting project.
+
+environment:
+  matrix:
+    - TARGET: x86_64-pc-windows-msvc
+      CHANNEL: stable
+    - TARGET: x86_64-pc-windows-msvc
+      CHANNEL: nightly
+
+cache:
+  - '%USERPROFILE%\.cargo\'
+
+install:
+  - appveyor-retry appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
+  - rustup-init.exe --default-host %TARGET% --default-toolchain %CHANNEL% -y
+  - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin
+  - rustc --version
+  - cargo --version
+  - rustup target add wasm32-unknown-unknown
+  - cargo install cargo-generate --features vendored-openssl
+
+build_script:
+  - cd ..
+  - cargo generate --git cosmwasm-template --name test-generation-in-ci
+  - cd test-generation-in-ci
+  - dir
+  - cargo unit-test
+  - cargo wasm
+  - cargo test
+  - cargo schema
+
+# whitelist long living branches
+branches:
+  only:
+    - master
