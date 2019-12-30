@@ -5,26 +5,13 @@
     {
       "type": "object",
       "required": [
-        "raw"
+        "getcount"
       ],
       "properties": {
-        "raw": {
-          "$ref": "#/definitions/RawQuery"
+        "getcount": {
+          "type": "object"
         }
       }
     }
-  ],
-  "definitions": {
-    "RawQuery": {
-      "type": "object",
-      "required": [
-        "key"
-      ],
-      "properties": {
-        "key": {
-          "type": "string"
-        }
-      }
-    }
-  }
+  ]
 }
