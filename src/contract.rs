@@ -186,6 +186,6 @@ mod tests {
         // should now be 5
         let mut res = query(&deps, QueryMsg::GetCount {}).unwrap();
         let value: CountResponse = from_slice(&res).unwrap();
-        assert_eq!(18, value.count);
+        assert_eq!(5, value.count);
     }
 }
