@@ -1,14 +1,11 @@
-use std::str::from_utf8;
-
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use snafu::{OptionExt, ResultExt};
 
-use cosmwasm::errors::{ContractErr, ParseErr, Result, SerializeErr, Unauthorized, Utf8Err};
-use cosmwasm::query::perform_raw_query;
+use cosmwasm::errors::{ContractErr, ParseErr, Result, SerializeErr, Unauthorized};
 use cosmwasm::serde::{from_slice, to_vec};
-use cosmwasm::storage::Storage;
-use cosmwasm::types::{Params, QueryResponse, RawQuery, Response};
+use cosmwasm::traits::{Api, Extern, Storage};
+use cosmwasm::types::{CanonicalAddr, Params, Response};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct InitMsg {
@@ -18,7 +15,7 @@ pub struct InitMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct State {
     pub count: i32,
-    pub owner: String,
+    pub owner: CanonicalAddr,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -31,59 +28,65 @@ pub enum HandleMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "lowercase")]
 pub enum QueryMsg {
-    Raw(RawQuery),
+    // GetCount returns the current count as a json-encoded number
+    GetCount {},
 }
 
-// raw_query is a helper to generate a serialized format of a raw_query
-// meant for test code and integration tests
-pub fn raw_query(key: &[u8]) -> Result<Vec<u8>> {
-    let key = from_utf8(key).context(Utf8Err {})?.to_string();
-    to_vec(&QueryMsg::Raw(RawQuery { key })).context(SerializeErr { kind: "QueryMsg" })
+// We define a custom struct for each query response
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct CountResponse {
+    pub count: i32,
 }
 
 pub static CONFIG_KEY: &[u8] = b"config";
 
-pub fn init<T: Storage>(store: &mut T, params: Params, msg: Vec<u8>) -> Result<Response> {
-    let msg: InitMsg = from_slice(&msg).context(ParseErr { kind: "InitMsg" })?;
-    store.set(
+pub fn init<S: Storage, A: Api>(
+    deps: &mut Extern<S, A>,
+    params: Params,
+    msg: InitMsg,
+) -> Result<Response> {
+    deps.storage.set(
         CONFIG_KEY,
         &to_vec(&State {
             count: msg.count,
             owner: params.message.signer,
         })
-            .context(SerializeErr { kind: "State" })?,
+        .context(SerializeErr { kind: "State" })?,
     );
     Ok(Response::default())
 }
 
-pub fn handle<T: Storage>(store: &mut T, params: Params, msg: Vec<u8>) -> Result<Response> {
-    let msg: HandleMsg = from_slice(&msg).context(ParseErr { kind: "HandleMsg" })?;
-    let data = store.get(CONFIG_KEY).context(ContractErr {
+pub fn handle<S: Storage, A: Api>(
+    deps: &mut Extern<S, A>,
+    params: Params,
+    msg: HandleMsg,
+) -> Result<Response> {
+    let data = deps.storage.get(CONFIG_KEY).context(ContractErr {
         msg: "uninitialized data",
     })?;
     let state: State = from_slice(&data).context(ParseErr { kind: "State" })?;
 
     match msg {
-        HandleMsg::Increment {} => try_increment(store, params, state),
-        HandleMsg::Reset { count } => try_reset(store, params, state, count),
+        HandleMsg::Increment {} => try_increment(deps, params, state),
+        HandleMsg::Reset { count } => try_reset(deps, params, state, count),
     }
 }
 
-pub fn try_increment<T: Storage>(
-    store: &mut T,
+pub fn try_increment<S: Storage, A: Api>(
+    deps: &mut Extern<S, A>,
     _params: Params,
     mut state: State,
 ) -> Result<Response> {
     state.count += 1;
-    store.set(
+    deps.storage.set(
         CONFIG_KEY,
         &to_vec(&state).context(SerializeErr { kind: "State" })?,
     );
     Ok(Response::default())
 }
 
-pub fn try_reset<T: Storage>(
-    store: &mut T,
+pub fn try_reset<S: Storage, A: Api>(
+    deps: &mut Extern<S, A>,
     params: Params,
     mut state: State,
     count: i32,
@@ -92,7 +95,7 @@ pub fn try_reset<T: Storage>(
         Unauthorized {}.fail()
     } else {
         state.count = count;
-        store.set(
+        deps.storage.set(
             CONFIG_KEY,
             &to_vec(&state).context(SerializeErr { kind: "State" })?,
         );
@@ -100,107 +103,101 @@ pub fn try_reset<T: Storage>(
     }
 }
 
-pub fn query<T: Storage>(store: &T, msg: Vec<u8>) -> Result<QueryResponse> {
-    let msg: QueryMsg = from_slice(&msg).context(ParseErr { kind: "QueryMsg" })?;
+pub fn query<S: Storage, A: Api>(deps: &Extern<S, A>, msg: QueryMsg) -> Result<Vec<u8>> {
     match msg {
-        QueryMsg::Raw(raw) => perform_raw_query(store, raw),
+        QueryMsg::GetCount {} => query_count(deps),
     }
+}
+
+fn query_count<S: Storage, A: Api>(deps: &Extern<S, A>) -> Result<Vec<u8>> {
+    let data = deps.storage.get(CONFIG_KEY).context(ContractErr {
+        msg: "uninitialized data",
+    })?;
+    let state: State = from_slice(&data).context(ParseErr { kind: "State" })?;
+    let resp = CountResponse { count: state.count };
+    to_vec(&resp).context(SerializeErr {
+        kind: "CountResponse",
+    })
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use cosmwasm::errors::Error;
-    use cosmwasm::mock::MockStorage;
-    use cosmwasm::types::{coin, mock_params};
+    use cosmwasm::mock::{dependencies, mock_params};
+    use cosmwasm::types::coin;
 
     #[test]
     fn proper_initialization() {
-        let mut store = MockStorage::new();
-        let msg = to_vec(&InitMsg { count: 17 }).unwrap();
-        let params = mock_params("creator", &coin("1000", "earth"), &[]);
+        let mut deps = dependencies(20);
+
+        let msg = InitMsg { count: 17 };
+        let params = mock_params(&deps.api, "creator", &coin("1000", "earth"), &[]);
+
         // we can just call .unwrap() to assert this was a success
-        let res = init(&mut store, params, msg).unwrap();
+        let res = init(&mut deps, params, msg).unwrap();
         assert_eq!(0, res.messages.len());
 
         // it worked, let's query the state
-        let mut q_res = query(&store, raw_query(CONFIG_KEY).unwrap()).unwrap();
-        let model = q_res.results.pop().expect("no data stored");
-        let state: State = from_slice(&model.val).unwrap();
-        assert_eq!(
-            state,
-            State {
-                owner: String::from("creator"),
-                count: 17,
-            }
-        );
-    }
-
-    #[test]
-    fn fails_on_bad_init() {
-        let mut store = MockStorage::new();
-        let bad_msg = b"{}".to_vec();
-        let params = mock_params("creator", &coin("1000", "earth"), &[]);
-        let res = init(&mut store, params, bad_msg);
-        assert_eq!(true, res.is_err());
+        let res = query(&deps, QueryMsg::GetCount {}).unwrap();
+        let value: CountResponse = from_slice(&res).unwrap();
+        assert_eq!(17, value.count);
     }
 
     #[test]
     fn increment() {
-        let mut store = MockStorage::new();
-        let msg = to_vec(&InitMsg { count: 17 }).unwrap();
-        let params = mock_params("creator", &coin("2", "token"), &coin("2", "token"));
-        let _res = init(&mut store, params, msg).unwrap();
+        let mut deps = dependencies(20);
+
+        let msg = InitMsg { count: 17 };
+        let params = mock_params(
+            &deps.api,
+            "creator",
+            &coin("2", "token"),
+            &coin("2", "token"),
+        );
+        let _res = init(&mut deps, params, msg).unwrap();
 
         // beneficiary can release it
-        let params = mock_params("anyone", &coin("2", "token"), &[]);
-        let msg = r#"{"increment":{}}"#.as_bytes();
-        let _res = handle(&mut store, params, msg.to_vec()).unwrap();
+        let params = mock_params(&deps.api, "anyone", &coin("2", "token"), &[]);
+        let msg = HandleMsg::Increment {};
+        let _res = handle(&mut deps, params, msg).unwrap();
 
         // should increase counter by 1
-        let mut q_res = query(&store, raw_query(CONFIG_KEY).unwrap()).unwrap();
-        let model = q_res.results.pop().expect("no data stored");
-        let state: State = from_slice(&model.val).unwrap();
-        assert_eq!(
-            state,
-            State {
-                owner: String::from("creator"),
-                count: 18,
-            }
-        );
+        let res = query(&deps, QueryMsg::GetCount {}).unwrap();
+        let value: CountResponse = from_slice(&res).unwrap();
+        assert_eq!(18, value.count);
     }
 
     #[test]
     fn reset() {
-        let mut store = MockStorage::new();
-        let msg = to_vec(&InitMsg { count: 17 }).unwrap();
-        let params = mock_params("creator", &coin("2", "token"), &coin("2", "token"));
-        let _res = init(&mut store, params, msg).unwrap();
+        let mut deps = dependencies(20);
+
+        let msg = InitMsg { count: 17 };
+        let params = mock_params(
+            &deps.api,
+            "creator",
+            &coin("2", "token"),
+            &coin("2", "token"),
+        );
+        let _res = init(&mut deps, params, msg).unwrap();
 
         // beneficiary can release it
-        let unauth_params = mock_params("anyone", &coin("2", "token"), &[]);
-        let msg = r#"{"reset":{"count": 5}}"#.as_bytes();
-        let res = handle(&mut store, unauth_params, msg.to_vec());
+        let unauth_params = mock_params(&deps.api, "anyone", &coin("2", "token"), &[]);
+        let msg = HandleMsg::Reset { count: 5 };
+        let res = handle(&mut deps, unauth_params, msg);
         match res {
-            Err(Error::Unauthorized{..}) => {},
+            Err(Error::Unauthorized { .. }) => {}
             _ => panic!("Must return unauthorized error"),
         }
 
         // only the original creator can reset the counter
-        let auth_params = mock_params("creator", &coin("2", "token"), &[]);
-        let msg = to_vec(&HandleMsg::Reset {count: 5}).unwrap();
-        let _res = handle(&mut store, auth_params, msg).unwrap();
+        let auth_params = mock_params(&deps.api, "creator", &coin("2", "token"), &[]);
+        let msg = HandleMsg::Reset { count: 5 };
+        let _res = handle(&mut deps, auth_params, msg).unwrap();
 
-        // should increase counter by 1
-        let mut q_res = query(&store, raw_query(CONFIG_KEY).unwrap()).unwrap();
-        let model = q_res.results.pop().expect("no data stored");
-        let state: State = from_slice(&model.val).unwrap();
-        assert_eq!(
-            state,
-            State {
-                owner: String::from("creator"),
-                count: 5,
-            }
-        );
+        // should now be 5
+        let res = query(&deps, QueryMsg::GetCount {}).unwrap();
+        let value: CountResponse = from_slice(&res).unwrap();
+        assert_eq!(5, value.count);
     }
 }
