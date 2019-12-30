@@ -19,8 +19,11 @@ jobs:
           name: Build
           command: cargo wasm --locked
       - run:
-          name: Integration tests
+          name: Unit tests
           env: RUST_BACKTRACE=1
+          command: cargo unit-test --locked
+      - run:
+          name: Integration tests
           command: cargo integration-test --locked
       - run:
           name: Build and run schema generator
