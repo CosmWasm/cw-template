@@ -11,20 +11,28 @@ environment:
   matrix:
     - TARGET: x86_64-pc-windows-msvc
       CHANNEL: stable
-    - TARGET: x86_64-pc-windows-msvc
-      CHANNEL: nightly
+#    - TARGET: x86_64-pc-windows-msvc
+#      CHANNEL: nightly
 
 cache:
-  - '%USERPROFILE%\.cargo\'
+  - 'C:\Users\appveyor\.cargo\bin'
+  - 'C:\Users\appveyor\.cargo\registry'
+  - 'C:\projects\test-generation-in-ci\target\debug\.fingerprint -> Cargo.lock, Cargo.toml'
+  - 'C:\projects\test-generation-in-ci\target\debug\build -> Cargo.lock, Cargo.toml'
+  - 'C:\projects\test-generation-in-ci\target\debug\deps -> Cargo.lock, Cargo.toml'
+  - 'C:\projects\test-generation-in-ci\target\wasm32-unknown-unknown\release\.fingerprint -> Cargo.lock, Cargo.toml'
+  - 'C:\projects\test-generation-in-ci\target\wasm32-unknown-unknown\release\build -> Cargo.lock, Cargo.toml'
+  - 'C:\projects\test-generation-in-ci\target\wasm32-unknown-unknown\release\deps -> Cargo.lock, Cargo.toml'
 
 install:
-  - appveyor-retry appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
-  - rustup-init.exe --default-host %TARGET% --default-toolchain %CHANNEL% -y
+  - echo hi
+  - cmd: if not exist 'C:\Users\appveyor\.cargo\bin\rustc' ( appveyor-retry appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe && rustup-init.exe --default-host %TARGET% --default-toolchain %CHANNEL% -y )
   - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin
+  - dir C:\Users\appveyor\.cargo\bin
   - rustc --version
   - cargo --version
   - rustup target add wasm32-unknown-unknown
-  - cargo install cargo-generate --features vendored-openssl
+  - cmd: if not exist 'C:\Users\appveyor\.cargo\bin\cargo-generate' ( cargo install cargo-generate --features vendored-openssl )
 
 build_script:
   - cd ..
