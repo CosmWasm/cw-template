@@ -53,7 +53,8 @@ build_script:
         Move-Item test-generation-in-ci/target target-cache;
         Remove-Item -path test-generation-in-ci -recurse
       }
-  - cargo generate --git cosmwasm-template --name test-generation-in-ci
+  - echo %APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH%
+  - cargo generate --git cosmwasm-template --name test-generation-in-ci --branch %APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH%
   - ps: |
       if (Test-Path 'target-cache') {
         Move-Item target-cache test-generation-in-ci/target
