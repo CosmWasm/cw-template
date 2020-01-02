@@ -47,26 +47,13 @@ published against a claim. You will want the following files:
 
 ### Generate Artifacts
 
-The following commands should allow you to generate the artifacts:
+The following commands will allow you to generate the artifacts in a determinstic manner,
+so it can easily be validate by others (please change `CONTRACT` to the name of your contract):
 
-`schema/*.json`:
-
-```shell script
-rm -rf schema
-cargo schema
-# or cargo run --example schema
-```
-
-`contract.wasm`:
-
-```shell script
-docker run --rm -u $(id -u):$(id -g) -v $(pwd):/code confio/cosmwasm-opt:0.4.1
-```
-
-`hash.txt`:
-
-```shell script
-sha256sum contract.wasm > hash.txt
+```sh
+docker run --rm -v $(pwd):/code \
+  --mount type=volume,source=CONTRACT_cache,target=/code/target \
+  confio/cosmwasm-opt:0.6.0
 ```
 
 Ensure you check in all the artifacts, and make a git commit with the final state.
@@ -79,6 +66,8 @@ multiple contracts and label it like `escrow-0.1.0`. Don't forget a
 
 Now that your package is properly configured and all artifacts are committed, it
 is time to share it with the world.
+Please refer to the [complete instructions for any questions](https://rurust.github.io/cargo-docs-ru/crates-io.html),
+but I will try to give a quick overview of the happy path here.
 
 ### Registry
 
@@ -106,3 +95,23 @@ Once you have published your package, people can now find it by
 But that isn't exactly the simplest way. To make things easier and help
 keep the ecosystem together, we suggest making a PR to add your package
 to the [`cawesome-wasm`](https://github.com/cosmwasm/cawesome-wasm) list.
+
+### Organizations
+
+Many times you are writing a contract not as a solo developer, but rather as
+part of an organization. You will want to allow colleagues to upload new
+versions of the contract to crates.io when you are on holiday.
+[These instructions show how]() you can set up your crate to allow multiple maintainers.
+
+You can add another owner to the crate by specifying their github user. Note, you will
+now both have complete control of the crate, and they can remove you:
+
+`cargo owner --add ethanfrey`
+
+You can also add an existing github team inside your organization:
+
+`cargo owner --add github:confio:developers`
+
+The team will allow anyone who is currently in the team to publish new versions of the crate.
+And this is automatically updated when you make changes on github. However, it will not allow
+anyone in the team to add or remove other owners.
