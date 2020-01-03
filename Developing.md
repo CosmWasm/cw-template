@@ -70,7 +70,7 @@ quite easy to code. In fact, usually you can just copy a few unit tests and modi
 a few lines to make an integration test (this should get even easier in a future release).
 
 To run the latest integration tests, you need to explicitely rebuild the Wasm file with
-`cargo wasm` and then run `cargo integration-tests`.
+`cargo wasm` and then run `cargo integration-test`.
 
 We consider testing critical for anything on a blockchain, and recommend to always keep
 the tests up to date. While doing active development, it is often simplest to disable
