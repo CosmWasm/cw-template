@@ -1,58 +1,25 @@
-use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
-use snafu::{OptionExt, ResultExt};
+use snafu::ResultExt;
 
-use cosmwasm::errors::{ContractErr, ParseErr, Result, SerializeErr, Unauthorized};
-use cosmwasm::serde::{from_slice, to_vec};
+use cosmwasm::errors::{Result, SerializeErr, Unauthorized};
+use cosmwasm::serde::to_vec;
 use cosmwasm::traits::{Api, Extern, Storage};
-use cosmwasm::types::{CanonicalAddr, Params, Response};
+use cosmwasm::types::{Params, Response};
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct InitMsg {
-    pub count: i32,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct State {
-    pub count: i32,
-    pub owner: CanonicalAddr,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-#[serde(rename_all = "lowercase")]
-pub enum HandleMsg {
-    Increment {},
-    Reset { count: i32 },
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-#[serde(rename_all = "lowercase")]
-pub enum QueryMsg {
-    // GetCount returns the current count as a json-encoded number
-    GetCount {},
-}
-
-// We define a custom struct for each query response
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct CountResponse {
-    pub count: i32,
-}
-
-pub static CONFIG_KEY: &[u8] = b"config";
+use crate::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg};
+use crate::state::{config, config_read, State};
 
 pub fn init<S: Storage, A: Api>(
     deps: &mut Extern<S, A>,
     params: Params,
     msg: InitMsg,
 ) -> Result<Response> {
-    deps.storage.set(
-        CONFIG_KEY,
-        &to_vec(&State {
-            count: msg.count,
-            owner: params.message.signer,
-        })
-        .context(SerializeErr { kind: "State" })?,
-    );
+    let state = State {
+        count: msg.count,
+        owner: params.message.signer,
+    };
+
+    config(&mut deps.storage).save(&state)?;
+
     Ok(Response::default())
 }
 
@@ -61,46 +28,38 @@ pub fn handle<S: Storage, A: Api>(
     params: Params,
     msg: HandleMsg,
 ) -> Result<Response> {
-    let data = deps.storage.get(CONFIG_KEY).context(ContractErr {
-        msg: "uninitialized data",
-    })?;
-    let state: State = from_slice(&data).context(ParseErr { kind: "State" })?;
-
     match msg {
-        HandleMsg::Increment {} => try_increment(deps, params, state),
-        HandleMsg::Reset { count } => try_reset(deps, params, state, count),
+        HandleMsg::Increment {} => try_increment(deps, params),
+        HandleMsg::Reset { count } => try_reset(deps, params, count),
     }
 }
 
 pub fn try_increment<S: Storage, A: Api>(
     deps: &mut Extern<S, A>,
     _params: Params,
-    mut state: State,
 ) -> Result<Response> {
-    state.count += 1;
-    deps.storage.set(
-        CONFIG_KEY,
-        &to_vec(&state).context(SerializeErr { kind: "State" })?,
-    );
+    config(&mut deps.storage).update(&|mut state| {
+        state.count += 1;
+        Ok(state)
+    })?;
+
     Ok(Response::default())
 }
 
 pub fn try_reset<S: Storage, A: Api>(
     deps: &mut Extern<S, A>,
     params: Params,
-    mut state: State,
     count: i32,
 ) -> Result<Response> {
-    if params.message.signer != state.owner {
-        Unauthorized {}.fail()
-    } else {
+    config(&mut deps.storage).update(&|mut state| {
+        if params.message.signer != state.owner {
+            Unauthorized {}.fail()?;
+        }
+
         state.count = count;
-        deps.storage.set(
-            CONFIG_KEY,
-            &to_vec(&state).context(SerializeErr { kind: "State" })?,
-        );
-        Ok(Response::default())
-    }
+        Ok(state)
+    })?;
+    Ok(Response::default())
 }
 
 pub fn query<S: Storage, A: Api>(deps: &Extern<S, A>, msg: QueryMsg) -> Result<Vec<u8>> {
@@ -110,10 +69,8 @@ pub fn query<S: Storage, A: Api>(deps: &Extern<S, A>, msg: QueryMsg) -> Result<V
 }
 
 fn query_count<S: Storage, A: Api>(deps: &Extern<S, A>) -> Result<Vec<u8>> {
-    let data = deps.storage.get(CONFIG_KEY).context(ContractErr {
-        msg: "uninitialized data",
-    })?;
-    let state: State = from_slice(&data).context(ParseErr { kind: "State" })?;
+    let state = config_read(&deps.storage).load()?;
+
     let resp = CountResponse { count: state.count };
     to_vec(&resp).context(SerializeErr {
         kind: "CountResponse",
@@ -125,6 +82,7 @@ mod tests {
     use super::*;
     use cosmwasm::errors::Error;
     use cosmwasm::mock::{dependencies, mock_params};
+    use cosmwasm::serde::from_slice;
     use cosmwasm::types::coin;
 
     #[test]

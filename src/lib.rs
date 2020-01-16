@@ -1,4 +1,6 @@
 pub mod contract;
+pub mod msg;
+pub mod state;
 
 /** Below we expose wasm exports * **/
 #[cfg(target_arch = "wasm32")]
