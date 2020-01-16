@@ -4,7 +4,7 @@ use cosmwasm::types::{coin, ContractResult};
 
 use cosmwasm_vm::testing::{handle, init, mock_instance, query};
 
-use {{crate_name}}::contract::{CountResponse, HandleMsg, InitMsg, QueryMsg};
+use {{crate_name}}::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg};
 
 /**
 This integration test tries to run and call the generated wasm.
