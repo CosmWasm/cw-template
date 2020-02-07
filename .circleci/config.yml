@@ -26,10 +26,13 @@ jobs:
           name: Integration tests
           command: cargo integration-test --locked
       - run:
+          name: Format source code
+          command: cargo fmt
+      - run:
           name: Build and run schema generator
           command: cargo schema --locked
       - run:
-          name: Ensure checked-in schemas are up-to-date
+          name: Ensure checked-in source code and schemas are up-to-date
           command: |
             CHANGES_IN_REPO=$(git status --porcelain)
             if [[ -n "$CHANGES_IN_REPO" ]]; then
