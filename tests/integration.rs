@@ -61,7 +61,7 @@ fn proper_initialization() {
 
     // it worked, let's query the state
     let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
-    let value: CountResponse = from_slice(&res.as_slice()).unwrap();
+    let value: CountResponse = from_slice(res.as_slice()).unwrap();
     assert_eq!(17, value.count);
 }
 
@@ -86,7 +86,7 @@ fn increment() {
     // should increase counter by 1
     let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
     // get(0).expect("no message")
-    let value: CountResponse = from_slice(&res.as_slice()).unwrap();
+    let value: CountResponse = from_slice(res.as_slice()).unwrap();
     assert_eq!(18, value.count);
 }
 
@@ -119,6 +119,6 @@ fn reset() {
 
     // should now be 5
     let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
-    let value: CountResponse = from_slice(&res.as_slice()).unwrap();
+    let value: CountResponse = from_slice(res.as_slice()).unwrap();
     assert_eq!(5, value.count);
 }
