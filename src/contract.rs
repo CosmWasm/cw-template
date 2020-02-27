@@ -3,19 +3,19 @@ use snafu::ResultExt;
 use cosmwasm::errors::{Result, SerializeErr, Unauthorized};
 use cosmwasm::serde::to_vec;
 use cosmwasm::traits::{Api, Extern, Storage};
-use cosmwasm::types::{Params, Response};
+use cosmwasm::types::{Response, Env};
 
 use crate::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg};
 use crate::state::{config, config_read, State};
 
 pub fn init<S: Storage, A: Api>(
     deps: &mut Extern<S, A>,
-    params: Params,
+    env: Env,
     msg: InitMsg,
 ) -> Result<Response> {
     let state = State {
         count: msg.count,
-        owner: params.message.signer,
+        owner: env.message.signer,
     };
 
     config(&mut deps.storage).save(&state)?;
@@ -25,18 +25,18 @@ pub fn init<S: Storage, A: Api>(
 
 pub fn handle<S: Storage, A: Api>(
     deps: &mut Extern<S, A>,
-    params: Params,
+    env: Env,
     msg: HandleMsg,
 ) -> Result<Response> {
     match msg {
-        HandleMsg::Increment {} => try_increment(deps, params),
-        HandleMsg::Reset { count } => try_reset(deps, params, count),
+        HandleMsg::Increment {} => try_increment(deps, env),
+        HandleMsg::Reset { count } => try_reset(deps, env, count),
     }
 }
 
 pub fn try_increment<S: Storage, A: Api>(
     deps: &mut Extern<S, A>,
-    _params: Params,
+    _env: Env,
 ) -> Result<Response> {
     config(&mut deps.storage).update(&|mut state| {
         state.count += 1;
@@ -48,11 +48,11 @@ pub fn try_increment<S: Storage, A: Api>(
 
 pub fn try_reset<S: Storage, A: Api>(
     deps: &mut Extern<S, A>,
-    params: Params,
+    env: Env,
     count: i32,
 ) -> Result<Response> {
     config(&mut deps.storage).update(&|mut state| {
-        if params.message.signer != state.owner {
+        if env.message.signer != state.owner {
             Unauthorized {}.fail()?;
         }
 
@@ -81,7 +81,7 @@ fn query_count<S: Storage, A: Api>(deps: &Extern<S, A>) -> Result<Vec<u8>> {
 mod tests {
     use super::*;
     use cosmwasm::errors::Error;
-    use cosmwasm::mock::{dependencies, mock_params};
+    use cosmwasm::mock::{dependencies, mock_env};
     use cosmwasm::serde::from_slice;
     use cosmwasm::types::coin;
 
@@ -90,10 +90,10 @@ mod tests {
         let mut deps = dependencies(20);
 
         let msg = InitMsg { count: 17 };
-        let params = mock_params(&deps.api, "creator", &coin("1000", "earth"), &[]);
+        let env = mock_env(&deps.api, "creator", &coin("1000", "earth"), &[]);
 
         // we can just call .unwrap() to assert this was a success
-        let res = init(&mut deps, params, msg).unwrap();
+        let res = init(&mut deps, env, msg).unwrap();
         assert_eq!(0, res.messages.len());
 
         // it worked, let's query the state
@@ -107,18 +107,18 @@ mod tests {
         let mut deps = dependencies(20);
 
         let msg = InitMsg { count: 17 };
-        let params = mock_params(
+        let env = mock_env(
             &deps.api,
             "creator",
             &coin("2", "token"),
             &coin("2", "token"),
         );
-        let _res = init(&mut deps, params, msg).unwrap();
+        let _res = init(&mut deps, env, msg).unwrap();
 
         // beneficiary can release it
-        let params = mock_params(&deps.api, "anyone", &coin("2", "token"), &[]);
+        let env = mock_env(&deps.api, "anyone", &coin("2", "token"), &[]);
         let msg = HandleMsg::Increment {};
-        let _res = handle(&mut deps, params, msg).unwrap();
+        let _res = handle(&mut deps, env, msg).unwrap();
 
         // should increase counter by 1
         let res = query(&deps, QueryMsg::GetCount {}).unwrap();
@@ -131,27 +131,27 @@ mod tests {
         let mut deps = dependencies(20);
 
         let msg = InitMsg { count: 17 };
-        let params = mock_params(
+        let env = mock_env(
             &deps.api,
             "creator",
             &coin("2", "token"),
             &coin("2", "token"),
         );
-        let _res = init(&mut deps, params, msg).unwrap();
+        let _res = init(&mut deps, env, msg).unwrap();
 
         // beneficiary can release it
-        let unauth_params = mock_params(&deps.api, "anyone", &coin("2", "token"), &[]);
+        let unauth_env = mock_env(&deps.api, "anyone", &coin("2", "token"), &[]);
         let msg = HandleMsg::Reset { count: 5 };
-        let res = handle(&mut deps, unauth_params, msg);
+        let res = handle(&mut deps, unauth_env, msg);
         match res {
             Err(Error::Unauthorized { .. }) => {}
             _ => panic!("Must return unauthorized error"),
         }
 
         // only the original creator can reset the counter
-        let auth_params = mock_params(&deps.api, "creator", &coin("2", "token"), &[]);
+        let auth_env = mock_env(&deps.api, "creator", &coin("2", "token"), &[]);
         let msg = HandleMsg::Reset { count: 5 };
-        let _res = handle(&mut deps, auth_params, msg).unwrap();
+        let _res = handle(&mut deps, auth_env, msg).unwrap();
 
         // should now be 5
         let res = query(&deps, QueryMsg::GetCount {}).unwrap();
