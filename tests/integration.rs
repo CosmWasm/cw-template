@@ -1,4 +1,4 @@
-use cosmwasm::mock::mock_params;
+use cosmwasm::mock::mock_env;
 use cosmwasm::serde::from_slice;
 use cosmwasm::types::{coin, ContractResult};
 
@@ -53,15 +53,15 @@ fn proper_initialization() {
     let mut deps = mock_instance(WASM);
 
     let msg = InitMsg { count: 17 };
-    let params = mock_params(&deps.api, "creator", &coin("1000", "earth"), &[]);
+    let env = mock_env(&deps.api, "creator", &coin("1000", "earth"), &[]);
 
     // we can just call .unwrap() to assert this was a success
-    let res = init(&mut deps, params, msg).unwrap();
+    let res = init(&mut deps, env, msg).unwrap();
     assert_eq!(0, res.messages.len());
 
     // it worked, let's query the state
     let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
-    let value: CountResponse = from_slice(&res).unwrap();
+    let value: CountResponse = from_slice(res.as_slice()).unwrap();
     assert_eq!(17, value.count);
 }
 
@@ -70,22 +70,22 @@ fn increment() {
     let mut deps = mock_instance(WASM);
 
     let msg = InitMsg { count: 17 };
-    let params = mock_params(
+    let env = mock_env(
         &deps.api,
         "creator",
         &coin("2", "token"),
         &coin("2", "token"),
     );
-    let _res = init(&mut deps, params, msg).unwrap();
+    let _res = init(&mut deps, env, msg).unwrap();
 
     // beneficiary can release it
-    let params = mock_params(&deps.api, "anyone", &coin("2", "token"), &[]);
+    let env = mock_env(&deps.api, "anyone", &coin("2", "token"), &[]);
     let msg = HandleMsg::Increment {};
-    let _res = handle(&mut deps, params, msg).unwrap();
+    let _res = handle(&mut deps, env, msg).unwrap();
 
     // should increase counter by 1
     let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
-    let value: CountResponse = from_slice(&res).unwrap();
+    let value: CountResponse = from_slice(res.as_slice()).unwrap();
     assert_eq!(18, value.count);
 }
 
@@ -94,30 +94,30 @@ fn reset() {
     let mut deps = mock_instance(WASM);
 
     let msg = InitMsg { count: 17 };
-    let params = mock_params(
+    let env = mock_env(
         &deps.api,
         "creator",
         &coin("2", "token"),
         &coin("2", "token"),
     );
-    let _res = init(&mut deps, params, msg).unwrap();
+    let _res = init(&mut deps, env, msg).unwrap();
 
     // beneficiary can release it
-    let unauth_params = mock_params(&deps.api, "anyone", &coin("2", "token"), &[]);
+    let unauth_env = mock_env(&deps.api, "anyone", &coin("2", "token"), &[]);
     let msg = HandleMsg::Reset { count: 5 };
-    let res = handle(&mut deps, unauth_params, msg);
+    let res = handle(&mut deps, unauth_env, msg);
     match res {
         ContractResult::Err(msg) => assert_eq!(msg, "Unauthorized"),
         _ => panic!("Expected error"),
     }
 
     // only the original creator can reset the counter
-    let auth_params = mock_params(&deps.api, "creator", &coin("2", "token"), &[]);
+    let auth_env = mock_env(&deps.api, "creator", &coin("2", "token"), &[]);
     let msg = HandleMsg::Reset { count: 5 };
-    let _res = handle(&mut deps, auth_params, msg).unwrap();
+    let _res = handle(&mut deps, auth_env, msg).unwrap();
 
     // should now be 5
     let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
-    let value: CountResponse = from_slice(&res).unwrap();
+    let value: CountResponse = from_slice(res.as_slice()).unwrap();
     assert_eq!(5, value.count);
 }
