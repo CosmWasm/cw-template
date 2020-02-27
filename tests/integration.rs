@@ -85,7 +85,6 @@ fn increment() {
 
     // should increase counter by 1
     let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
-    // get(0).expect("no message")
     let value: CountResponse = from_slice(res.as_slice()).unwrap();
     assert_eq!(18, value.count);
 }
