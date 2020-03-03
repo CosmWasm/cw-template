@@ -3,12 +3,12 @@
 If you have recently created a contract with this template, you probably could use some
 help on how to build and test the contract, as well as prepare it for production. This
 file attempts to provide a brief overview, assuming you have installed a recent
-version of rust already (eg. 1.38+).
+version of Rust already (eg. 1.40+).
 
 ## Prerequisites
 
-Before starting, make sure you have [rustup](https://rustup.rs/) along with a recent `rustc` and `cargo`
-version installed. Currently, we are testing on 1.38+.
+Before starting, make sure you have [rustup](https://rustup.rs/) along with a
+recent `rustc` and `cargo` version installed. Currently, we are testing on 1.40+.
 
 And you need to have the `wasm32-unknown-unknown` target installed as well.
 
@@ -140,4 +140,3 @@ static WASM: &[u8] = include_bytes!("../contract.wasm");
 Note that this is the same (deterministic) code you will be uploading to
 a blockchain to test it out, as we need to shrink the size and produce a
 clear mapping from wasm hash back to the source code.
-
