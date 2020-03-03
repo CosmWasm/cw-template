@@ -1,12 +1,12 @@
 # Publishing Contracts
 
-This is a quick overview of how to publish contracts in this repo, or any other
-repo.
+This is an overview of how to publish the contract's source code in this repo.
+We use Cargo's default registry [crates.io](https://crates.io/) for publishing contracts written in Rust.
 
 ## Preparation
 
 Ensure the `Cargo.toml` file in the repo is properly configured. In particular, you want to
-choose a name starting with `cw-`, which will help a lot finding cosmwasm contracts when
+choose a name starting with `cw-`, which will help a lot finding CosmWasm contracts when
 searching on crates.io. For the first publication, you will probably want version `0.1.0`.
 If you have tested this on a public net already and/or had an audit on the code,
 you can start with `1.0.0`, but that should imply some level of stability and confidence.
@@ -21,46 +21,44 @@ repository = "https://github.com/confio/cosmwasm-examples"
 
 You will also want to add a valid [SPDX license statement](https://spdx.org/licenses/),
 so others know the rules for using this crate. You can use any license you wish,
-even a commercial license, but we recommend choosing one of the following, unless you have a
-personal opinion.
+even a commercial license, but we recommend choosing one of the following, unless you have
+specific requirements.
 
 * Permissive: [`Apache-2.0`](https://spdx.org/licenses/Apache-2.0.html#licenseText) or [`MIT`](https://spdx.org/licenses/MIT.html#licenseText)
-* Free Software: [`GPL-3.0-or-later`](https://spdx.org/licenses/GPL-3.0-or-later.html#licenseText) or [`AGPL-3.0-or-later`](https://spdx.org/licenses/AGPL-3.0-or-later.html#licenseText)
+* Copyleft: [`GPL-3.0-or-later`](https://spdx.org/licenses/GPL-3.0-or-later.html#licenseText) or [`AGPL-3.0-or-later`](https://spdx.org/licenses/AGPL-3.0-or-later.html#licenseText)
 * Commercial license: `Commercial` (not sure if this works, I cannot find examples)
 
 It is also helpful to download the LICENSE text (linked to above) and store this
 in a LICENSE file in your repo. Now, you have properly configured your crate for use
 in a larger ecosystem.
 
+### Updating schema
 
-### Artifacts
-
-To allow easy use of the contract, we can publish the schema, optimized wasm code,
-as well as the expected hash. You should never take this as definitive proof
-without checking it first, but the validity of these generated files will be part
-of any review. This provides a canonical place to store them, so that reviews can be
-published against a claim. You will want the following files:
-
-* `schema/*.json`
-* `contract.wasm`
-* `hash.txt`
-
-### Generate Artifacts
-
-The following commands will allow you to generate the artifacts in a determinstic manner,
-so it can easily be validate by others (please change `CONTRACT` to the name of your contract):
+To allow easy use of the contract, we can publish the schema (`schema/*.json`) together
+with the source code.
 
 ```sh
-docker run --rm -v $(pwd):/code \
-  --mount type=volume,source=CONTRACT_cache,target=/code/target \
-  confio/cosmwasm-opt:0.6.0
+cargo schema
 ```
 
-Ensure you check in all the artifacts, and make a git commit with the final state.
+Ensure you check in all the schema files, and make a git commit with the final state.
 This commit will be published and should be tagged. Generally, you will want to
 tag with the version (eg. `v0.1.0`), but in the `cosmwasm-examples` repo, we have
 multiple contracts and label it like `escrow-0.1.0`. Don't forget a
 `git push && git push --tags`
+
+### Note on build results
+
+Build results like Wasm bytecode or expected hash don't need to be updated since
+the don't belong to the source publication. However, they are excluded from packaging
+in `Cargo.toml` which allows you to commit them to your git repository if you like.
+
+```toml
+exclude = ["contract.wasm", "hash.txt"]
+```
+
+A single source code can be built with multiple different optimizers, so
+we should not make any strict assumptions on the tooling that will be used.
 
 ## Publishing
 
