@@ -4,7 +4,11 @@ version = "0.1.0"
 authors = ["{{authors}}"]
 edition = "2018"
 
-exclude = ["contract.wasm", "hash.txt"]
+exclude = [
+  # Those files are cosmwasm-opt artifacts. You might want to commit them for convenience but they should not be part of the source code publication.
+  "contract.wasm",
+  "hash.txt",
+]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
