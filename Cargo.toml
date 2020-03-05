@@ -30,9 +30,9 @@ overflow-checks = true
 default = ["cranelift"]
 # for quicker tests, cargo test --lib
 # for more explicit tests, cargo test --features=backtraces
-backtraces = [ "cosmwasm/backtraces", "cosmwasm-vm/backtraces" ]
-cranelift = [ "cosmwasm-vm/default-cranelift"]
-singlepass = [ "cosmwasm-vm/default-singlepass"]
+backtraces = ["cosmwasm/backtraces", "cosmwasm-vm/backtraces"]
+cranelift = ["cosmwasm-vm/default-cranelift"]
+singlepass = ["cosmwasm-vm/default-singlepass"]
 
 [dependencies]
 cosmwasm = { version = "0.7.0" }
