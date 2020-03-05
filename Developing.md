@@ -103,10 +103,10 @@ produce an extremely small build output in a consistent manner. The suggest way
 to run it is this:
 
 ```sh
-docker run --rm -v "$(pwd):/code" \
-  --mount type=volume,source=$(basename $(pwd))_cache,target=/code/target \
+docker run --rm -v "$(pwd)":/code \
+  --mount type=volume,source=$(basename "$(pwd)")_cache,target=/code/target \
   --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
-  confio/cosmwasm-opt:0.7.0
+  confio/cosmwasm-opt:0.7.2
 ```
 
 We must mount the contract code to `/code`. You can use a absolute path instead
