@@ -3,7 +3,7 @@ use snafu::ResultExt;
 use cosmwasm::errors::{Result, SerializeErr, Unauthorized};
 use cosmwasm::serde::to_vec;
 use cosmwasm::traits::{Api, Extern, Storage};
-use cosmwasm::types::{Response, Env};
+use cosmwasm::types::{Env, Response};
 
 use crate::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg};
 use crate::state::{config, config_read, State};
@@ -34,10 +34,7 @@ pub fn handle<S: Storage, A: Api>(
     }
 }
 
-pub fn try_increment<S: Storage, A: Api>(
-    deps: &mut Extern<S, A>,
-    _env: Env,
-) -> Result<Response> {
+pub fn try_increment<S: Storage, A: Api>(deps: &mut Extern<S, A>, _env: Env) -> Result<Response> {
     config(&mut deps.storage).update(&|mut state| {
         state.count += 1;
         Ok(state)

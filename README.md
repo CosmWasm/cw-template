@@ -30,6 +30,19 @@ cargo generate --git https://github.com/confio/cosmwasm-template.git --name YOUR
 You will now have a new folder called `YOUR_NAME_HERE` (I hope you changed that to something else)
 containing a simple working contract and build system that you can customize.
 
+## CI Support
+
+We have templates for both github actions and Circle CI in the generated project, so you can
+get up an running with CI right away. One note is that the CI runs all `cargo` commands
+with `--locked` to ensure it uses the exact same versions as you have locally. This also means
+you must have an up-to-date `Cargo.lock` file, which is not auto-generated.
+
+The first time you set up the project (or after adding any dep), you should ensure the
+`Cargo.lock` file is updated, so the CI will test properly. This can be done simply by
+running:
+
+`cargo check`
+
 ## Using your project
 
 Once you have your custom repo, you should check out [Developing](./Developing.md) to explain
