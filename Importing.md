@@ -4,73 +4,21 @@ In [Publishing](./Publishing.md), we discussed how you can publish your contract
 This looks at the flip-side, how can you use someone else's contract (which is the same
 question as how they will use your contract). Let's go through the various stages.
 
-## Getting the Code
-
-Before using remote code, you most certainly want to verify it is honest.
-There are two ways to get the code of another contract, either by cloning the git repo
-or by downloading the cargo crate. You should be familiar with using git already.
-However, the rust publishing system doesn't rely on git tags (they are optional),
-so to make sure you are looking at the proper code, I would suggest getting the
-actual code of the tagged crate.
-
-```sh
-cargo install cargo-download
-cargo download cw-escrow==0.1.0 > crate.tar.gz
-tar xzvf crate.tar.gz
-cd cw-escrow-0.1.0
-```
-
-(alternate, simpler approach, but seems to be broken):
-
-```sh
-cargo install cargo-clone
-cargo clone cw-escrow --vers 0.1.0
-```
-
 ## Verifying Artifacts
 
+Before using remote code, you most certainly want to verify it is honest.
+
 The simplest audit of the repo is to simply check that the artifacts in the repo
-are correct. You can use the same commands you do when developing, with the one
-exception that the `.cargo/config` file is not present on downloaded crates,
-so you will have to run the full commands.
+are correct. This involves recompiling the claimed source with the claimed builder
+and validating that the locally compiled code (hash) matches the code hash that was
+uploaded. This will verify that the source code is the correct preimage. Which allows
+one to audit the original (Rust) source code, rather than looking at wasm bytecode.
 
-First, make a git commit here, so we can quickly see any diffs:
-
-```sh
-git init .
-echo target > .gitignore
-git add .
-git commit -m 'From crates.io'
-```
-
-To validate the tests:
-
-```sh
-cargo build --release --target wasm32-unknown-unknown
-cargo test
-```
-
-To generate the schema:
-
-```sh
-cargo run --example schema
-```
-
-And to generate the `contract.wasm` and `hash.txt`:
-
-```sh
-docker run --rm -u $(id -u):$(id -g) -v $(pwd):/code confio/cosmwasm-opt:0.4.1
-sha256sum contract.wasm > hash.txt
-```
-
-Make sure the values you generate match what was uploaded with a simple `git diff`.
-If there is any discrepancy, please raise an issue on the repo, and please add an issue
-to the cawesome-wasm list if the package is listed there (it should be validated before
-adding, but just in case).
-
-In the future, we will produce a script to do this automatic verification steps that can
-be run by many individuals to quickly catch any fake uploaded wasm hashes in a
-decentralized manner.
+We have a script to do this automatic verification steps that can
+easily be run by many individuals. Please check out
+[`cosmwasm-verify`](https://github.com/CosmWasm/cosmwasm-verify/blob/master/README.md)
+to see a simple shell script that does all these steps and easily allows you to verify
+any uploaded contract.
 
 ## Reviewing
 
