@@ -5,10 +5,10 @@
     {
       "type": "object",
       "required": [
-        "getcount"
+        "get_count"
       ],
       "properties": {
-        "getcount": {
+        "get_count": {
           "type": "object"
         }
       }
