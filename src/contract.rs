@@ -1,6 +1,6 @@
 use cosmwasm_std::{
     to_binary, unauthorized, Api, Binary, Env, Extern, HandleResponse, InitResponse, Querier,
-    Result, Storage,
+    StdResult, Storage,
 };
 
 use crate::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg};
@@ -10,7 +10,7 @@ pub fn init<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     env: Env,
     msg: InitMsg,
-) -> Result<InitResponse> {
+) -> StdResult<InitResponse> {
     let state = State {
         count: msg.count,
         owner: env.message.signer,
@@ -25,7 +25,7 @@ pub fn handle<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     env: Env,
     msg: HandleMsg,
-) -> Result<HandleResponse> {
+) -> StdResult<HandleResponse> {
     match msg {
         HandleMsg::Increment {} => try_increment(deps, env),
         HandleMsg::Reset { count } => try_reset(deps, env, count),
@@ -35,7 +35,7 @@ pub fn handle<S: Storage, A: Api, Q: Querier>(
 pub fn try_increment<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     _env: Env,
-) -> Result<HandleResponse> {
+) -> StdResult<HandleResponse> {
     config(&mut deps.storage).update(&|mut state| {
         state.count += 1;
         Ok(state)
@@ -48,7 +48,7 @@ pub fn try_reset<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     env: Env,
     count: i32,
-) -> Result<HandleResponse> {
+) -> StdResult<HandleResponse> {
     config(&mut deps.storage).update(&|mut state| {
         if env.message.signer != state.owner {
             return unauthorized();
@@ -62,13 +62,13 @@ pub fn try_reset<S: Storage, A: Api, Q: Querier>(
 pub fn query<S: Storage, A: Api, Q: Querier>(
     deps: &Extern<S, A, Q>,
     msg: QueryMsg,
-) -> Result<Binary> {
+) -> StdResult<Binary> {
     match msg {
         QueryMsg::GetCount {} => query_count(deps),
     }
 }
 
-fn query_count<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> Result<Binary> {
+fn query_count<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> StdResult<Binary> {
     let state = config_read(&deps.storage).load()?;
     let resp = CountResponse { count: state.count };
     to_binary(&resp)
@@ -78,7 +78,7 @@ fn query_count<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> Result
 mod tests {
     use super::*;
     use cosmwasm_std::testing::{mock_dependencies, mock_env};
-    use cosmwasm_std::{coins, from_binary, Error};
+    use cosmwasm_std::{coins, from_binary, StdError};
 
     #[test]
     fn proper_initialization() {
@@ -129,7 +129,7 @@ mod tests {
         let msg = HandleMsg::Reset { count: 5 };
         let res = handle(&mut deps, unauth_env, msg);
         match res {
-            Err(Error::Unauthorized { .. }) => {}
+            Err(StdError::Unauthorized { .. }) => {}
             _ => panic!("Must return unauthorized error"),
         }
 
