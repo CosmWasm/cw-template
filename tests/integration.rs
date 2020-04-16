@@ -5,9 +5,9 @@
 //! You can easily convert unit tests to integration tests.
 //! 1. First copy them over verbatum,
 //! 2. Then change
-//!      let mut deps = mock_dependencies(20);
+//!      let mut deps = mock_dependencies(20, &[]);
 //!    to
-//!      let mut deps = mock_instance(WASM);
+//!      let mut deps = mock_instance(WASM, &[]);
 //! 3. If you access raw storage, where ever you see something like:
 //!      deps.storage.get(CONFIG_KEY).expect("no data stored");
 //!    replace it with:
@@ -16,20 +16,20 @@
 //!          //...
 //!      });
 //! 4. Anywhere you see query(&deps, ...) you must replace it with query(&mut deps, ...)
-//! 5. When matching on error codes, you can not use Error types, but rather must use strings:
-//!      match res {
-//!          Err(Error::Unauthorized{..}) => {},
+//! 5. When matching on error codes, you can not use Error types, but rather corresponding ApiError variants.
+//!    Note that you don't have backtrace field and can often skip the .. filler:
+//!      match res.unwrap_err() {
+//!          Error::Unauthorized { .. } => {}
 //!          _ => panic!("Must return unauthorized error"),
 //!      }
 //!    becomes:
-//!      match res {
-//!         ContractResult::Err(msg) => assert_eq!(msg, "Unauthorized"),
-//!         _ => panic!("Expected error"),
+//!      match res.unwrap_err() {
+//!          ApiError::Unauthorized {} => {}
+//!          _ => panic!("Must return unauthorized error"),
 //!      }
 
-use cosmwasm::mock::mock_env;
-use cosmwasm::serde::from_slice;
-use cosmwasm::types::{coins, ContractResult};
+use cosmwasm::testing::mock_env;
+use cosmwasm::{coins, from_binary, ApiError, ContractResult};
 
 use cosmwasm_vm::testing::{handle, init, mock_instance, query};
 
@@ -53,20 +53,16 @@ fn proper_initialization() {
 
     // it worked, let's query the state
     let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
-    let value: CountResponse = from_slice(res.as_slice()).unwrap();
+    let value: CountResponse = from_binary(res.as_slice()).unwrap();
     assert_eq!(17, value.count);
 }
 
 #[test]
 fn increment() {
-let mut deps = mock_instance(WASM, &coins(2, "token"));
+    let mut deps = mock_instance(WASM, &coins(2, "token"));
 
     let msg = InitMsg { count: 17 };
-    let env = mock_env(
-        &deps.api,
-        "creator",
-        &coins(2, "token"),
-    );
+    let env = mock_env(&deps.api, "creator", &coins(2, "token"));
     let _res = init(&mut deps, env, msg).unwrap();
 
     // beneficiary can release it
@@ -76,7 +72,7 @@ let mut deps = mock_instance(WASM, &coins(2, "token"));
 
     // should increase counter by 1
     let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
-    let value: CountResponse = from_slice(res.as_slice()).unwrap();
+    let value: CountResponse = from_binary(res.as_slice()).unwrap();
     assert_eq!(18, value.count);
 }
 
@@ -85,20 +81,16 @@ fn reset() {
     let mut deps = mock_instance(WASM, &coins(2, "token"));
 
     let msg = InitMsg { count: 17 };
-    let env = mock_env(
-        &deps.api,
-        "creator",
-        &coins(2, "token"),
-    );
+    let env = mock_env(&deps.api, "creator", &coins(2, "token"));
     let _res = init(&mut deps, env, msg).unwrap();
 
     // beneficiary can release it
     let unauth_env = mock_env(&deps.api, "anyone", &coins(2, "token"));
     let msg = HandleMsg::Reset { count: 5 };
     let res = handle(&mut deps, unauth_env, msg);
-    match res {
-        ContractResult::Err(msg) => assert_eq!(msg, "Unauthorized"),
-        _ => panic!("Expected error"),
+    match res.unwrap_err() {
+        ApiError::Unauthorized { .. } => {}
+        _ => panic!("Expected unauthorized"),
     }
 
     // only the original creator can reset the counter
@@ -108,6 +100,6 @@ fn reset() {
 
     // should now be 5
     let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
-    let value: CountResponse = from_slice(res.as_slice()).unwrap();
+    let value: CountResponse = from_binary(res.as_slice()).unwrap();
     assert_eq!(5, value.count);
 }

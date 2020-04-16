@@ -77,8 +77,8 @@ fn query_count<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> Result
 #[cfg(test)]
 mod tests {
     use super::*;
-    use cosmwasm_std::{coins, from_binary, Error};
     use cosmwasm_std::testing::{mock_dependencies, mock_env};
+    use cosmwasm_std::{coins, from_binary, Error};
 
     #[test]
     fn proper_initialization() {
@@ -102,11 +102,7 @@ mod tests {
         let mut deps = mock_dependencies(20, &coins(2, "token"));
 
         let msg = InitMsg { count: 17 };
-        let env = mock_env(
-            &deps.api,
-            "creator",
-            &coins(2, "token"),
-        );
+        let env = mock_env(&deps.api, "creator", &coins(2, "token"));
         let _res = init(&mut deps, env, msg).unwrap();
 
         // beneficiary can release it
@@ -125,11 +121,7 @@ mod tests {
         let mut deps = mock_dependencies(20, &coins(2, "token"));
 
         let msg = InitMsg { count: 17 };
-        let env = mock_env(
-            &deps.api,
-            "creator",
-            &coins(2, "token"),
-        );
+        let env = mock_env(&deps.api, "creator", &coins(2, "token"));
         let _res = init(&mut deps, env, msg).unwrap();
 
         // beneficiary can release it
