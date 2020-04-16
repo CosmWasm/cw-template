@@ -1,4 +1,4 @@
-use cosmwasm_std::{to_binary, Api, Extern, Storage, Result, unauthorized, Env, Response, Querier, Binary};
+use cosmwasm_std::{to_binary, Api, Extern, Storage, Result, unauthorized, Env, HandleResponse, InitResponse, Querier, Binary};
 
 use crate::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg};
 use crate::state::{config, config_read, State};
@@ -7,7 +7,7 @@ pub fn init<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     env: Env,
     msg: InitMsg,
-) -> Result<Response> {
+) -> Result<InitResponse> {
     let state = State {
         count: msg.count,
         owner: env.message.signer,
@@ -15,34 +15,34 @@ pub fn init<S: Storage, A: Api, Q: Querier>(
 
     config(&mut deps.storage).save(&state)?;
 
-    Ok(Response::default())
+    Ok(InitResponse::default())
 }
 
 pub fn handle<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     env: Env,
     msg: HandleMsg,
-) -> Result<Response> {
+) -> Result<HandleResponse> {
     match msg {
         HandleMsg::Increment {} => try_increment(deps, env),
         HandleMsg::Reset { count } => try_reset(deps, env, count),
     }
 }
 
-pub fn try_increment<S: Storage, A: Api, Q: Querier>(deps: &mut Extern<S, A, Q>, _env: Env) -> Result<Response> {
+pub fn try_increment<S: Storage, A: Api, Q: Querier>(deps: &mut Extern<S, A, Q>, _env: Env) -> Result<HandleResponse> {
     config(&mut deps.storage).update(&|mut state| {
         state.count += 1;
         Ok(state)
     })?;
 
-    Ok(Response::default())
+    Ok(HandleResponse::default())
 }
 
 pub fn try_reset<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     env: Env,
     count: i32,
-) -> Result<Response> {
+) -> Result<HandleResponse> {
     config(&mut deps.storage).update(&|mut state| {
         if env.message.signer != state.owner {
             return unauthorized();
@@ -50,7 +50,7 @@ pub fn try_reset<S: Storage, A: Api, Q: Querier>(
         state.count = count;
         Ok(state)
     })?;
-    Ok(Response::default())
+    Ok(HandleResponse::default())
 }
 
 pub fn query<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>, msg: QueryMsg) -> Result<Binary> {
