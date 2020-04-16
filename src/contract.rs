@@ -1,6 +1,4 @@
-use snafu::ResultExt;
-
-use cosmwasm_std::{to_binary, Api, Extern, Storage, Result, SerializeErr, Unauthorized, Env, Response, Querier, Binary};
+use cosmwasm_std::{to_binary, Api, Extern, Storage, Result, unauthorized, Env, Response, Querier, Binary};
 
 use crate::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg};
 use crate::state::{config, config_read, State};
@@ -47,9 +45,8 @@ pub fn try_reset<S: Storage, A: Api, Q: Querier>(
 ) -> Result<Response> {
     config(&mut deps.storage).update(&|mut state| {
         if env.message.signer != state.owner {
-            Unauthorized {}.fail()?;
+            return unauthorized();
         }
-
         state.count = count;
         Ok(state)
     })?;
