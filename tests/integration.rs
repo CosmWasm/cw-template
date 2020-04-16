@@ -28,8 +28,8 @@
 //!          _ => panic!("Must return unauthorized error"),
 //!      }
 
-use cosmwasm::testing::mock_env;
-use cosmwasm::{coins, from_binary, ApiError, ContractResult};
+use cosmwasm_std::testing::mock_env;
+use cosmwasm_std::{coins, from_binary, ApiError};
 
 use cosmwasm_vm::testing::{handle, init, mock_instance, query};
 
