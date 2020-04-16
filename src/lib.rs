@@ -5,8 +5,9 @@ pub mod state;
 #[cfg(target_arch = "wasm32")]
 mod wasm {
     use super::contract;
-    use cosmwasm::{exports, imports};
-    use std::ffi::c_void;
+    use cosmwasm_std::{
+        do_handle, do_init, do_query, ExternalApi, ExternalQuerier, ExternalStorage,
+    };
 
     #[no_mangle]
     extern "C" fn init(params_ptr: *mut c_void, msg_ptr: *mut c_void) -> *mut c_void {
@@ -34,6 +35,6 @@ mod wasm {
         )
     }
 
-    // Other C externs like cosmwasm_api_0_6, allocate, deallocate are available
-    // automatically because we `use cosmwasm`.
+    // Other C externs like cosmwasm_vm_version_1, allocate, deallocate are available
+    // automatically because we `use cosmwasm_std`.
 }
