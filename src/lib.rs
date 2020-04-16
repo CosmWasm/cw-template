@@ -10,27 +10,27 @@ mod wasm {
     };
 
     #[no_mangle]
-    extern "C" fn init(params_ptr: *mut c_void, msg_ptr: *mut c_void) -> *mut c_void {
-        exports::do_init(
-            &contract::init::<imports::ExternalStorage, imports::ExternalApi>,
-            params_ptr,
+    extern "C" fn init(env_ptr: u32, msg_ptr: u32) -> u32 {
+        do_init(
+            &contract::init::<ExternalStorage, ExternalApi, ExternalQuerier>,
+            env_ptr,
             msg_ptr,
         )
     }
 
     #[no_mangle]
-    extern "C" fn handle(params_ptr: *mut c_void, msg_ptr: *mut c_void) -> *mut c_void {
-        exports::do_handle(
-            &contract::handle::<imports::ExternalStorage, imports::ExternalApi>,
-            params_ptr,
+    extern "C" fn handle(env_ptr: u32, msg_ptr: u32) -> u32 {
+        do_handle(
+            &contract::handle::<ExternalStorage, ExternalApi, ExternalQuerier>,
+            env_ptr,
             msg_ptr,
         )
     }
 
     #[no_mangle]
-    extern "C" fn query(msg_ptr: *mut c_void) -> *mut c_void {
-        exports::do_query(
-            &contract::query::<imports::ExternalStorage, imports::ExternalApi>,
+    extern "C" fn query(msg_ptr: u32) -> u32 {
+        do_query(
+            &contract::query::<ExternalStorage, ExternalApi, ExternalQuerier>,
             msg_ptr,
         )
     }

@@ -85,7 +85,7 @@ mod tests {
         let mut deps = mock_dependencies(20, &[]);
 
         let msg = InitMsg { count: 17 };
-        let env = mock_env(&deps.api, "creator", &coins("1000", "earth"));
+        let env = mock_env(&deps.api, "creator", &coins(1000, "earth"));
 
         // we can just call .unwrap() to assert this was a success
         let res = init(&mut deps, env, msg).unwrap();
@@ -99,18 +99,18 @@ mod tests {
 
     #[test]
     fn increment() {
-        let mut deps = mock_dependencies(20, &coins("2", "token"));
+        let mut deps = mock_dependencies(20, &coins(2, "token"));
 
         let msg = InitMsg { count: 17 };
         let env = mock_env(
             &deps.api,
             "creator",
-            &coins("2", "token"),
+            &coins(2, "token"),
         );
         let _res = init(&mut deps, env, msg).unwrap();
 
         // beneficiary can release it
-        let env = mock_env(&deps.api, "anyone", &coins("2", "token"));
+        let env = mock_env(&deps.api, "anyone", &coins(2, "token"));
         let msg = HandleMsg::Increment {};
         let _res = handle(&mut deps, env, msg).unwrap();
 
@@ -122,18 +122,18 @@ mod tests {
 
     #[test]
     fn reset() {
-        let mut deps = mock_dependencies(20, &coins("2", "token"));
+        let mut deps = mock_dependencies(20, &coins(2, "token"));
 
         let msg = InitMsg { count: 17 };
         let env = mock_env(
             &deps.api,
             "creator",
-            &coins("2", "token"),
+            &coins(2, "token"),
         );
         let _res = init(&mut deps, env, msg).unwrap();
 
         // beneficiary can release it
-        let unauth_env = mock_env(&deps.api, "anyone", &coins("2", "token"));
+        let unauth_env = mock_env(&deps.api, "anyone", &coins(2, "token"));
         let msg = HandleMsg::Reset { count: 5 };
         let res = handle(&mut deps, unauth_env, msg);
         match res {
@@ -142,7 +142,7 @@ mod tests {
         }
 
         // only the original creator can reset the counter
-        let auth_env = mock_env(&deps.api, "creator", &coins("2", "token"));
+        let auth_env = mock_env(&deps.api, "creator", &coins(2, "token"));
         let msg = HandleMsg::Reset { count: 5 };
         let _res = handle(&mut deps, auth_env, msg).unwrap();
 
