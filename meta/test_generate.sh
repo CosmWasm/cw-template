@@ -21,12 +21,19 @@ PROJECT_NAME="test-gen"
     echo "This is what was generated"
     ls -lA
 
-    echo "Building wasm ..."
-    cargo wasm
-    echo "Running tests ..."
+    # Check formatting
+    echo "Checking formatting ..."
+    cargo fmt -- --check
+
+    # Debug builds first to fail fast
+    echo "Running unit tests ..."
     cargo unit-test
-    cargo integration-test
     echo "Creating schema ..."
     cargo schema
+
+    echo "Building wasm ..."
+    cargo wasm
+    echo "Running integration tests ..."
+    cargo integration-test
   )
 )
