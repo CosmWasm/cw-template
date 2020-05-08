@@ -13,7 +13,7 @@ pub fn init<S: Storage, A: Api, Q: Querier>(
 ) -> StdResult<InitResponse> {
     let state = State {
         count: msg.count,
-        owner: env.message.signer,
+        owner: env.message.sender,
     };
 
     config(&mut deps.storage).save(&state)?;
@@ -50,8 +50,8 @@ pub fn try_reset<S: Storage, A: Api, Q: Querier>(
     count: i32,
 ) -> StdResult<HandleResponse> {
     config(&mut deps.storage).update(&|mut state| {
-        if env.message.signer != state.owner {
-            return unauthorized();
+        if env.message.sender != state.owner {
+            return Err(unauthorized());
         }
         state.count = count;
         Ok(state)

@@ -35,12 +35,12 @@ cranelift = ["cosmwasm-vm/default-cranelift"]
 singlepass = ["cosmwasm-vm/default-singlepass"]
 
 [dependencies]
-cosmwasm-std = { git = "https://github.com/CosmWasm/cosmwasm", rev = "92f319e9f629f89999ca3a4b3ff14a12cfcb06c3" }
-cosmwasm-storage = { git = "https://github.com/CosmWasm/cosmwasm", rev = "92f319e9f629f89999ca3a4b3ff14a12cfcb06c3" }
+cosmwasm-std = { version = "0.8.0-alpha1" }
+cosmwasm-storage = { version = "0.8.0-alpha1" }
 schemars = "0.7"
 serde = { version = "1.0.103", default-features = false, features = ["derive"] }
 snafu = { version = "0.6.3" }
 
 [dev-dependencies]
-cosmwasm-vm = { git = "https://github.com/CosmWasm/cosmwasm", default-features = false, rev = "92f319e9f629f89999ca3a4b3ff14a12cfcb06c3" }
-cosmwasm-schema = { git = "https://github.com/CosmWasm/cosmwasm", rev = "92f319e9f629f89999ca3a4b3ff14a12cfcb06c3" }
+cosmwasm-vm = { version = "0.8.0-alpha1", default-features = false }
+cosmwasm-schema = { version = "0.8.0-alpha1" }
