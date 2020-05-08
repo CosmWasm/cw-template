@@ -18,7 +18,7 @@
 //! 4. Anywhere you see query(&deps, ...) you must replace it with query(&mut deps, ...)
 
 use cosmwasm_std::testing::mock_env;
-use cosmwasm_std::{coins, from_binary, ApiError};
+use cosmwasm_std::{coins, from_binary, HandleResponse, HandleResult, InitResponse, StdError};
 
 use cosmwasm_vm::testing::{handle, init, mock_instance, query};
 
@@ -37,7 +37,7 @@ fn proper_initialization() {
     let env = mock_env(&deps.api, "creator", &coins(1000, "earth"));
 
     // we can just call .unwrap() to assert this was a success
-    let res = init(&mut deps, env, msg).unwrap();
+    let res: InitResponse = init(&mut deps, env, msg).unwrap();
     assert_eq!(0, res.messages.len());
 
     // it worked, let's query the state
@@ -52,12 +52,12 @@ fn increment() {
 
     let msg = InitMsg { count: 17 };
     let env = mock_env(&deps.api, "creator", &coins(2, "token"));
-    let _res = init(&mut deps, env, msg).unwrap();
+    let _res: InitResponse = init(&mut deps, env, msg).unwrap();
 
     // beneficiary can release it
     let env = mock_env(&deps.api, "anyone", &coins(2, "token"));
     let msg = HandleMsg::Increment {};
-    let _res = handle(&mut deps, env, msg).unwrap();
+    let _res: HandleResponse = handle(&mut deps, env, msg).unwrap();
 
     // should increase counter by 1
     let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
@@ -71,21 +71,21 @@ fn reset() {
 
     let msg = InitMsg { count: 17 };
     let env = mock_env(&deps.api, "creator", &coins(2, "token"));
-    let _res = init(&mut deps, env, msg).unwrap();
+    let _res: InitResponse = init(&mut deps, env, msg).unwrap();
 
     // beneficiary can release it
     let unauth_env = mock_env(&deps.api, "anyone", &coins(2, "token"));
     let msg = HandleMsg::Reset { count: 5 };
-    let res = handle(&mut deps, unauth_env, msg);
+    let res: HandleResult = handle(&mut deps, unauth_env, msg);
     match res.unwrap_err() {
-        ApiError::Unauthorized { .. } => {}
+        StdError::Unauthorized { .. } => {}
         _ => panic!("Expected unauthorized"),
     }
 
     // only the original creator can reset the counter
     let auth_env = mock_env(&deps.api, "creator", &coins(2, "token"));
     let msg = HandleMsg::Reset { count: 5 };
-    let _res = handle(&mut deps, auth_env, msg).unwrap();
+    let _res: HandleResponse = handle(&mut deps, auth_env, msg).unwrap();
 
     // should now be 5
     let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
