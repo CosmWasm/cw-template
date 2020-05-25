@@ -5,9 +5,9 @@
 //! You can easily convert unit tests to integration tests.
 //! 1. First copy them over verbatum,
 //! 2. Then change
-//!      let mut deps = mock_dependencies(20);
+//!      let mut deps = mock_dependencies(20, &[]);
 //!    to
-//!      let mut deps = mock_instance(WASM);
+//!      let mut deps = mock_instance(WASM, &[]);
 //! 3. If you access raw storage, where ever you see something like:
 //!      deps.storage.get(CONFIG_KEY).expect("no data stored");
 //!    replace it with:
@@ -16,22 +16,9 @@
 //!          //...
 //!      });
 //! 4. Anywhere you see query(&deps, ...) you must replace it with query(&mut deps, ...)
-//! 5. When matching on error codes, you can not use Error types, but rather must use strings:
-//!      match res {
-//!          Err(Error::Unauthorized{..}) => {},
-//!          _ => panic!("Must return unauthorized error"),
-//!      }
-//!    becomes:
-//!      match res {
-//!         ContractResult::Err(msg) => assert_eq!(msg, "Unauthorized"),
-//!         _ => panic!("Expected error"),
-//!      }
 
-use cosmwasm::mock::mock_env;
-use cosmwasm::serde::from_slice;
-use cosmwasm::types::{coin, ContractResult};
-
-use cosmwasm_vm::testing::{handle, init, mock_instance, query};
+use cosmwasm_std::{coins, from_binary, HandleResponse, HandleResult, InitResponse, StdError};
+use cosmwasm_vm::testing::{handle, init, mock_env, mock_instance, query};
 
 use {{crate_name}}::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg};
 
@@ -42,74 +29,64 @@ static WASM: &[u8] = include_bytes!("../target/wasm32-unknown-unknown/release/{{
 
 #[test]
 fn proper_initialization() {
-    let mut deps = mock_instance(WASM);
+    let mut deps = mock_instance(WASM, &[]);
 
     let msg = InitMsg { count: 17 };
-    let env = mock_env(&deps.api, "creator", &coin("1000", "earth"), &[]);
+    let env = mock_env(&deps.api, "creator", &coins(1000, "earth"));
 
     // we can just call .unwrap() to assert this was a success
-    let res = init(&mut deps, env, msg).unwrap();
+    let res: InitResponse = init(&mut deps, env, msg).unwrap();
     assert_eq!(0, res.messages.len());
 
     // it worked, let's query the state
     let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
-    let value: CountResponse = from_slice(res.as_slice()).unwrap();
+    let value: CountResponse = from_binary(&res).unwrap();
     assert_eq!(17, value.count);
 }
 
 #[test]
 fn increment() {
-    let mut deps = mock_instance(WASM);
+    let mut deps = mock_instance(WASM, &coins(2, "token"));
 
     let msg = InitMsg { count: 17 };
-    let env = mock_env(
-        &deps.api,
-        "creator",
-        &coin("2", "token"),
-        &coin("2", "token"),
-    );
-    let _res = init(&mut deps, env, msg).unwrap();
+    let env = mock_env(&deps.api, "creator", &coins(2, "token"));
+    let _res: InitResponse = init(&mut deps, env, msg).unwrap();
 
     // beneficiary can release it
-    let env = mock_env(&deps.api, "anyone", &coin("2", "token"), &[]);
+    let env = mock_env(&deps.api, "anyone", &coins(2, "token"));
     let msg = HandleMsg::Increment {};
-    let _res = handle(&mut deps, env, msg).unwrap();
+    let _res: HandleResponse = handle(&mut deps, env, msg).unwrap();
 
     // should increase counter by 1
     let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
-    let value: CountResponse = from_slice(res.as_slice()).unwrap();
+    let value: CountResponse = from_binary(&res).unwrap();
     assert_eq!(18, value.count);
 }
 
 #[test]
 fn reset() {
-    let mut deps = mock_instance(WASM);
+    let mut deps = mock_instance(WASM, &coins(2, "token"));
 
     let msg = InitMsg { count: 17 };
-    let env = mock_env(
-        &deps.api,
-        "creator",
-        &coin("2", "token"),
-        &coin("2", "token"),
-    );
-    let _res = init(&mut deps, env, msg).unwrap();
+    let env = mock_env(&deps.api, "creator", &coins(2, "token"));
+    let _res: InitResponse = init(&mut deps, env, msg).unwrap();
 
     // beneficiary can release it
-    let unauth_env = mock_env(&deps.api, "anyone", &coin("2", "token"), &[]);
+    let unauth_env = mock_env(&deps.api, "anyone", &coins(2, "token"));
     let msg = HandleMsg::Reset { count: 5 };
-    let res = handle(&mut deps, unauth_env, msg);
-    match res {
-        ContractResult::Err(msg) => assert_eq!(msg, "Unauthorized"),
-        _ => panic!("Expected error"),
+    let res: HandleResult = handle(&mut deps, unauth_env, msg);
+    match res.unwrap_err() {
+        StdError::Unauthorized { .. } => {}
+        _ => panic!("Expected unauthorized"),
     }
 
     // only the original creator can reset the counter
-    let auth_env = mock_env(&deps.api, "creator", &coin("2", "token"), &[]);
+    let auth_env = mock_env(&deps.api, "creator", &coins(2, "token"));
     let msg = HandleMsg::Reset { count: 5 };
-    let _res = handle(&mut deps, auth_env, msg).unwrap();
+    let _res: HandleResponse = handle(&mut deps, auth_env, msg).unwrap();
 
     // should now be 5
     let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
-    let value: CountResponse = from_slice(res.as_slice()).unwrap();
+    let value: CountResponse = from_binary(&res).unwrap();
     assert_eq!(5, value.count);
 }
