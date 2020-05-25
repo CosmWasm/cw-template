@@ -13,8 +13,12 @@ environment:
   TOOLCHAIN: 1.43.1
 
 cache:
-  - $HOME/.rustup -> meta/appveyor.yml
-  - $HOME/.cargo -> meta/appveyor.yml
+  - $HOME/.rustup/ -> meta/appveyor.yml
+  # For details about cargo caching see https://doc.rust-lang.org/cargo/guide/cargo-home.html#caching-the-cargo-home-in-ci
+  - $HOME/.cargo/bin/ -> meta/appveyor.yml
+  - $HOME/.cargo/registry/index/ -> meta/appveyor.yml
+  - $HOME/.cargo/registry/cache/ -> meta/appveyor.yml
+  - $HOME/.cargo/git/db/ -> meta/appveyor.yml
 
 install:
   - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain "$TOOLCHAIN" -y
