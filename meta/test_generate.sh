@@ -5,7 +5,7 @@ command -v shellcheck > /dev/null && shellcheck "$0"
 REPO_ROOT="$(realpath "$(dirname "$0")/..")"
 
 TMP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/cosmwasm-template.XXXXXXXXX")
-PROJECT_NAME="test-gen"
+PROJECT_NAME="testgen-local"
 
 (
   echo "Navigating to $TMP_DIR"
