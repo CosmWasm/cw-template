@@ -17,7 +17,7 @@ cache:
   - $HOME/.cargo
 
 install:
-  - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --profile minimal --default-toolchain "$TOOLCHAIN" -y
+  - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain "$TOOLCHAIN" -y
   - source $HOME/.cargo/env
   - rustc --version
   - cargo --version
@@ -33,6 +33,7 @@ build_script:
   - cargo generate --git cosmwasm-template --name test-generation-in-ci --branch current-ci-checkout
   - cd test-generation-in-ci
   - ls -lA
+  - cargo fmt -- --check
   - cargo unit-test
   - cargo wasm
   - cargo integration-test
