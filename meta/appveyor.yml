@@ -13,8 +13,8 @@ environment:
   TOOLCHAIN: 1.43.1
 
 cache:
-  - $HOME/.rustup
-  - $HOME/.cargo
+  - $HOME/.rustup -> meta/appveyor.yml
+  - $HOME/.cargo -> meta/appveyor.yml
 
 install:
   - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain "$TOOLCHAIN" -y
