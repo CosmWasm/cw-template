@@ -17,10 +17,8 @@
 //!      });
 //! 4. Anywhere you see query(&deps, ...) you must replace it with query(&mut deps, ...)
 
-use cosmwasm_std::testing::mock_env;
 use cosmwasm_std::{coins, from_binary, HandleResponse, HandleResult, InitResponse, StdError};
-
-use cosmwasm_vm::testing::{handle, init, mock_instance, query};
+use cosmwasm_vm::testing::{handle, init, mock_env, mock_instance, query};
 
 use {{crate_name}}::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg};
 
