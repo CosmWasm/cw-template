@@ -34,8 +34,8 @@ build_script:
   # cargo generate.
   - git branch current-ci-checkout
   - cd ..
-  - cargo generate --git cosmwasm-template --name test-generation-in-ci --branch current-ci-checkout
-  - cd test-generation-in-ci
+  - cargo generate --git cosmwasm-template --name testgen-ci --branch current-ci-checkout
+  - cd testgen-ci
   - ls -lA
   - cargo fmt -- --check
   - cargo unit-test
