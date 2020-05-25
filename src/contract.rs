@@ -36,7 +36,7 @@ pub fn try_increment<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     _env: Env,
 ) -> StdResult<HandleResponse> {
-    config(&mut deps.storage).update(&|mut state| {
+    config(&mut deps.storage).update(|mut state| {
         state.count += 1;
         Ok(state)
     })?;
@@ -49,7 +49,7 @@ pub fn try_reset<S: Storage, A: Api, Q: Querier>(
     env: Env,
     count: i32,
 ) -> StdResult<HandleResponse> {
-    config(&mut deps.storage).update(&|mut state| {
+    config(&mut deps.storage).update(|mut state| {
         if env.message.sender != state.owner {
             return Err(unauthorized());
         }
