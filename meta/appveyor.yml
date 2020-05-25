@@ -7,44 +7,19 @@
 # location. Furthermore it allows us to ship a Circle CI and Travis config
 # generated for the resulting project.
 
-# I'm having a hard time with the caching below and variable interpolation
-# Free free to add later and update the install script, but make sure caching works
-
-#environment:
-#  matrix:
-#    - TARGET: x86_64-pc-windows-msvc
-#      CHANNEL: stable
-##    - TARGET: x86_64-pc-windows-msvc
-##      CHANNEL: nightly
+image: Ubuntu
 
 cache:
-  - 'C:\Users\appveyor\.rustup'
-  - 'C:\Users\appveyor\.cargo\bin'
-  - 'C:\Users\appveyor\.cargo\registry'
-  - 'C:\projects\test-generation-in-ci\target\debug\.fingerprint -> Cargo.lock, Cargo.toml'
-  - 'C:\projects\test-generation-in-ci\target\debug\build -> Cargo.lock, Cargo.toml'
-  - 'C:\projects\test-generation-in-ci\target\debug\deps -> Cargo.lock, Cargo.toml'
-  - 'C:\projects\test-generation-in-ci\target\wasm32-unknown-unknown\release\.fingerprint -> Cargo.lock, Cargo.toml'
-  - 'C:\projects\test-generation-in-ci\target\wasm32-unknown-unknown\release\build -> Cargo.lock, Cargo.toml'
-  - 'C:\projects\test-generation-in-ci\target\wasm32-unknown-unknown\release\deps -> Cargo.lock, Cargo.toml'
+  - $HOME/.rustup
+  - $HOME/.cargo
 
-# note, I need the 'echo okay' at the end so powershell doens't mistake info logs for error messages
 install:
-  - ps: |
-      if (-not (Test-Path 'C:\Users\appveyor\.cargo\bin\rustc.exe')) {
-        appveyor-retry appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe ;
-        .\rustup-init.exe --profile minimal --default-host x86_64-pc-windows-msvc --default-toolchain stable -y ;
-        echo okay
-      }
-  - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin
+  - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --profile minimal --default-toolchain stable -y
+  - source $HOME/.cargo/env
   - rustc --version
   - cargo --version
   - rustup target add wasm32-unknown-unknown
-  - ps: |
-      if (-not (Test-Path 'C:\Users\appveyor\.cargo\bin\cargo-generate.exe')) {
-        cargo install cargo-generate --features vendored-openssl ;
-        echo okay
-      }
+  - cargo install cargo-generate --features vendored-openssl
 
 build_script:
   # No matter what is currently checked out by the CI (master, other branch, PR merge commit),
@@ -52,18 +27,9 @@ build_script:
   # cargo generate.
   - git branch current-ci-checkout
   - cd ..
-  - ps: |
-      if (Test-Path 'test-generation-in-ci/target') {
-        Move-Item test-generation-in-ci/target target-cache;
-        Remove-Item -path test-generation-in-ci -recurse
-      }
   - cargo generate --git cosmwasm-template --name test-generation-in-ci --branch current-ci-checkout
-  - ps: |
-      if (Test-Path 'target-cache') {
-        Move-Item target-cache test-generation-in-ci/target
-      }
   - cd test-generation-in-ci
-  - dir
+  - ls -lA
   - cargo unit-test
   - cargo wasm
   - cargo integration-test
