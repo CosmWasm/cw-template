@@ -36,12 +36,12 @@ fn proper_initialization() {
 
     // we can just call .unwrap() to assert this was a success
     let res: InitResponse = init(&mut deps, env, msg).unwrap();
-    assert_eq!(0, res.messages.len());
+    assert_eq!(res.messages.len(), 0);
 
     // it worked, let's query the state
     let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
     let value: CountResponse = from_binary(&res).unwrap();
-    assert_eq!(17, value.count);
+    assert_eq!(value.count, 17);
 }
 
 #[test]
@@ -60,7 +60,7 @@ fn increment() {
     // should increase counter by 1
     let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
     let value: CountResponse = from_binary(&res).unwrap();
-    assert_eq!(18, value.count);
+    assert_eq!(value.count, 18);
 }
 
 #[test]
@@ -88,5 +88,5 @@ fn reset() {
     // should now be 5
     let res = query(&mut deps, QueryMsg::GetCount {}).unwrap();
     let value: CountResponse = from_binary(&res).unwrap();
-    assert_eq!(5, value.count);
+    assert_eq!(value.count, 5);
 }

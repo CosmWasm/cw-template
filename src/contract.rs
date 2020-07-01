@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    to_binary, unauthorized, Api, Binary, Env, Extern, HandleResponse, InitResponse, Querier,
+    to_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse, Querier, StdError,
     StdResult, Storage,
 };
 
@@ -51,7 +51,7 @@ pub fn try_reset<S: Storage, A: Api, Q: Querier>(
 ) -> StdResult<HandleResponse> {
     config(&mut deps.storage).update(|mut state| {
         if env.message.sender != state.owner {
-            return Err(unauthorized());
+            return Err(StdError::unauthorized());
         }
         state.count = count;
         Ok(state)
@@ -64,14 +64,13 @@ pub fn query<S: Storage, A: Api, Q: Querier>(
     msg: QueryMsg,
 ) -> StdResult<Binary> {
     match msg {
-        QueryMsg::GetCount {} => query_count(deps),
+        QueryMsg::GetCount {} => to_binary(&query_count(deps)?),
     }
 }
 
-fn query_count<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> StdResult<Binary> {
+fn query_count<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> StdResult<CountResponse> {
     let state = config_read(&deps.storage).load()?;
-    let resp = CountResponse { count: state.count };
-    to_binary(&resp)
+    Ok(CountResponse { count: state.count })
 }
 
 #[cfg(test)]
