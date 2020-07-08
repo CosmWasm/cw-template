@@ -51,7 +51,7 @@ pub fn try_reset<S: Storage, A: Api, Q: Querier>(
 ) -> StdResult<HandleResponse> {
     config(&mut deps.storage).update(|mut state| {
         if env.message.sender != state.owner {
-            return Err(StdError::unauthorized());
+            return Err(StdError::Unauthorized { backtrace: None });
         }
         state.count = count;
         Ok(state)
