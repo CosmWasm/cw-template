@@ -25,7 +25,7 @@ rustup target add wasm32-unknown-unknown
 ## Compiling and running tests
 
 Now that you created your custom contract, make sure you can compile and run it before
-making any changes. Go into the
+making any changes. Go into the repository and do:
 
 ```sh
 # this will produce a wasm build in ./target/wasm32-unknown-unknown/release/YOUR_NAME_HERE.wasm
@@ -106,7 +106,7 @@ to run it is this:
 docker run --rm -v "$(pwd)":/code \
   --mount type=volume,source="$(basename "$(pwd)")_cache",target=/code/target \
   --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
-  cosmwasm/rust-optimizer:0.8.0
+  cosmwasm/rust-optimizer:0.9.0
 ```
 
 We must mount the contract code to `/code`. You can use a absolute path instead
