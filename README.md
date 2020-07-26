@@ -23,10 +23,16 @@ cargo install cargo-generate --features vendored-openssl
 Now, use it to create your new contract.
 Go to the folder in which you want to place it and run:
 
-**0.9 (latest)**
+**0.10 (latest)**
 
 ```sh
 cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --name YOUR_NAME_HERE
+```
+
+**0.9**
+
+```sh
+cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.9 --name YOUR_NAME_HERE
 ```
 
 **0.8**
