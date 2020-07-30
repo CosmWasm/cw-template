@@ -32,7 +32,7 @@ fn proper_initialization() {
     let mut deps = mock_instance(WASM, &[]);
 
     let msg = InitMsg { count: 17 };
-    let env = mock_env(&deps.api, "creator", &coins(1000, "earth"));
+    let env = mock_env("creator", &coins(1000, "earth"));
 
     // we can just call .unwrap() to assert this was a success
     let res: InitResponse = init(&mut deps, env, msg).unwrap();
@@ -49,11 +49,11 @@ fn increment() {
     let mut deps = mock_instance(WASM, &coins(2, "token"));
 
     let msg = InitMsg { count: 17 };
-    let env = mock_env(&deps.api, "creator", &coins(2, "token"));
+    let env = mock_env("creator", &coins(2, "token"));
     let _res: InitResponse = init(&mut deps, env, msg).unwrap();
 
     // beneficiary can release it
-    let env = mock_env(&deps.api, "anyone", &coins(2, "token"));
+    let env = mock_env("anyone", &coins(2, "token"));
     let msg = HandleMsg::Increment {};
     let _res: HandleResponse = handle(&mut deps, env, msg).unwrap();
 
@@ -68,11 +68,11 @@ fn reset() {
     let mut deps = mock_instance(WASM, &coins(2, "token"));
 
     let msg = InitMsg { count: 17 };
-    let env = mock_env(&deps.api, "creator", &coins(2, "token"));
+    let env = mock_env("creator", &coins(2, "token"));
     let _res: InitResponse = init(&mut deps, env, msg).unwrap();
 
     // beneficiary can release it
-    let unauth_env = mock_env(&deps.api, "anyone", &coins(2, "token"));
+    let unauth_env = mock_env("anyone", &coins(2, "token"));
     let msg = HandleMsg::Reset { count: 5 };
     let res: HandleResult = handle(&mut deps, unauth_env, msg);
     match res.unwrap_err() {
@@ -81,7 +81,7 @@ fn reset() {
     }
 
     // only the original creator can reset the counter
-    let auth_env = mock_env(&deps.api, "creator", &coins(2, "token"));
+    let auth_env = mock_env("creator", &coins(2, "token"));
     let msg = HandleMsg::Reset { count: 5 };
     let _res: HandleResponse = handle(&mut deps, auth_env, msg).unwrap();
 
