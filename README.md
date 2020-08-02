@@ -1,7 +1,7 @@
-# CosmWasm Starter Pack
+# Secret Contracts Starter Pack
 
-This is a template to build smart contracts in Rust to run inside a
-[Cosmos SDK](https://github.com/cosmos/cosmos-sdk) module on all chains that enable it.
+This is a template to build secret contracts in Rust to run in
+[Secret Network](https://github.com/enigmampc/SecretNetwork).
 To understand the framework better, please read the overview in the
 [cosmwasm repo](https://github.com/CosmWasm/cosmwasm/blob/master/README.md),
 and dig into the [cosmwasm docs](https://www.cosmwasm.com).
@@ -26,13 +26,7 @@ Go to the folder in which you want to place it and run:
 **0.9 (latest)**
 
 ```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --name YOUR_NAME_HERE
-```
-
-**0.8**
-
-```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.8 --name YOUR_NAME_HERE
+cargo generate --git https://github.com/enigmampc/secret-template.git --name YOUR_NAME_HERE
 ```
 
 You will now have a new folder called `YOUR_NAME_HERE` (I hope you changed that to something else)
@@ -53,19 +47,6 @@ git commit -m 'Initial Commit'
 git remote add origin YOUR-GIT-URL
 git push -u origin master
 ```
-
-## CI Support
-
-We have template configurations for both [GitHub Actions](.github/workflows/Basic.yml)
-and [Circle CI](.circleci/config.yml) in the generated project, so you can
-get up and running with CI right away.
-
-One note is that the CI runs all `cargo` commands
-with `--locked` to ensure it uses the exact same versions as you have locally. This also means
-you must have an up-to-date `Cargo.lock` file, which is not auto-generated.
-The first time you set up the project (or after adding any dep), you should ensure the
-`Cargo.lock` file is updated, so the CI will test properly. This can be done simply by
-running `cargo check` or `cargo unit-test`.
 
 ## Using your project
 
