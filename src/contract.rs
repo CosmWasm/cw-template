@@ -13,7 +13,7 @@ pub fn init<S: Storage, A: Api, Q: Querier>(
 ) -> StdResult<InitResponse> {
     let state = State {
         count: msg.count,
-        owner: env.message.sender,
+        owner: deps.api.canonical_address(&env.message.sender)?,
     };
 
     config(&mut deps.storage).save(&state)?;
@@ -49,8 +49,9 @@ pub fn try_reset<S: Storage, A: Api, Q: Querier>(
     env: Env,
     count: i32,
 ) -> StdResult<HandleResponse> {
+    let sender_address_raw = deps.api.canonical_address(&env.message.sender)?;
     config(&mut deps.storage).update(|mut state| {
-        if env.message.sender != state.owner {
+        if sender_address_raw != state.owner {
             return Err(StdError::Unauthorized { backtrace: None });
         }
         state.count = count;
