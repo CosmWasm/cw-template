@@ -40,8 +40,6 @@ build_script:
   - cargo fmt -- --check
   - cargo unit-test
   - cargo wasm
-  - cargo integration-test
-#  - cargo integration-test --no-default-features --features singlepass
   - cargo schema
 
 # whitelist long living branches

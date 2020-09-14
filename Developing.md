@@ -34,27 +34,9 @@ cargo wasm
 # this runs unit tests with helpful backtraces
 RUST_BACKTRACE=1 cargo unit-test
 
-# this runs integration tests with cranelift backend (uses rust stable)
-cargo integration-test
-
-# this runs integration tests with singlepass backend (needs rust nightly)
-cargo integration-test --no-default-features --features singlepass
-
 # auto-generate json schema
 cargo schema
 ```
-
-The wasmer engine, embedded in `cosmwasm-vm` supports multiple backends:
-singlepass and cranelift. Singlepass has fast compile times and slower run times,
-and supportes gas metering. It also requires rust `nightly`. This is used as default
-when embedding `cosmwasm-vm` in `go-cosmwasm` and is needed to use if you want to
-check the gas usage.
-
-However, when just building contacts, if you don't want to worry about installing
-two rust toolchains, you can run all tests with cranelift. The integration tests
-may take a small bit longer, but the results will be the same. The only difference
-is that you can not check gas usage here, so if you wish to optimize gas, you must
-switch to nightly and run with cranelift.
 
 ### Understanding the tests
 
@@ -62,22 +44,8 @@ The main code is in `src/contract.rs` and the unit tests there run in pure rust,
 which makes them very quick to execute and give nice output on failures, especially
 if you do `RUST_BACKTRACE=1 cargo unit-test`.
 
-However, we don't just want to test the logic rust, but also the compiled Wasm artifact
-inside a VM. You can look in `tests/integration.rs` to see some examples there. They
-load the Wasm binary into the vm and call the contract externally. Effort has been
-made that the syntax is very similar to the calls in the native rust contract and
-quite easy to code. In fact, usually you can just copy a few unit tests and modify
-a few lines to make an integration test (this should get even easier in a future release).
-
-To run the latest integration tests, you need to explicitely rebuild the Wasm file with
-`cargo wasm` and then run `cargo integration-test`.
-
 We consider testing critical for anything on a blockchain, and recommend to always keep
-the tests up to date. While doing active development, it is often simplest to disable
-the integration tests completely and iterate rapidly on the code in `contract.rs`,
-both the logic and the tests. Once the code is finalized, you can copy over some unit
-tests into the integration.rs and make the needed changes. This ensures the compiled
-Wasm also behaves as desired in the real system.
+the tests up to date.
 
 ## Generating JSON Schema
 
@@ -106,7 +74,7 @@ to run it is this:
 docker run --rm -v "$(pwd)":/code \
   --mount type=volume,source="$(basename "$(pwd)")_cache",target=/code/target \
   --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
-  cosmwasm/rust-optimizer:0.9.0
+  cosmwasm/rust-optimizer:0.10.3
 ```
 
 We must mount the contract code to `/code`. You can use a absolute path instead
