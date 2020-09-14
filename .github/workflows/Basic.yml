@@ -37,13 +37,6 @@ jobs:
         env:
           RUSTFLAGS: "-C link-arg=-s"
 
-      - name: Run integration tests
-        uses: actions-rs/cargo@v1
-        with:
-          command: integration-test
-          args: --locked
-
-
   lints:
     name: Lints
     runs-on: ubuntu-latest
