@@ -26,22 +26,22 @@ Go to the folder in which you want to place it and run:
 **0.10 (latest)**
 
 ```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --name YOUR_NAME_HERE
+cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --name PROJECT_NAME
 ```
 
 **0.9**
 
 ```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.9 --name YOUR_NAME_HERE
+cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.9 --name PROJECT_NAME
 ```
 
 **0.8**
 
 ```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.8 --name YOUR_NAME_HERE
+cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.8 --name PROJECT_NAME
 ```
 
-You will now have a new folder called `YOUR_NAME_HERE` (I hope you changed that to something else)
+You will now have a new folder called `PROJECT_NAME` (I hope you changed that to something else)
 containing a simple working contract and build system that you can customize.
 
 ## Create a Repo
