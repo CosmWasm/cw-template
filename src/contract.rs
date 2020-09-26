@@ -2,10 +2,15 @@ use cosmwasm_std::{
     to_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse, MessageInfo, Querier,
     StdResult, Storage,
 };
+use cw2::set_contract_version;
 
 use crate::error::ContractError;
 use crate::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg};
 use crate::state::{config, config_read, State};
+
+// version info for migration info
+const CONTRACT_NAME: &str = "crates.io:{{project-name}}";
+const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 // Note, you can use StdResult in some functions where you do not
 // make use of the custom errors
@@ -15,6 +20,8 @@ pub fn init<S: Storage, A: Api, Q: Querier>(
     info: MessageInfo,
     msg: InitMsg,
 ) -> StdResult<InitResponse> {
+    set_contract_version(&mut deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+
     let state = State {
         count: msg.count,
         owner: deps.api.canonical_address(&info.sender)?,
