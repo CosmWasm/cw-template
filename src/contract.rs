@@ -3,6 +3,7 @@ use cosmwasm_std::{
     StdError, StdResult, Storage,
 };
 
+use crate::errors::MyCustomError;
 use crate::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg};
 use crate::state::{config, config_read, State};
 
@@ -39,7 +40,7 @@ pub fn handle<S: Storage, A: Api, Q: Querier>(
 pub fn try_increment<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
 ) -> Result<HandleResponse, ContractError> {
-    config(&mut deps.storage).update(|mut state| {
+    config(&mut deps.storage).update(|mut state| -> Result<_, ContractError> {
         state.count += 1;
         Ok(state)
     })?;
@@ -53,7 +54,7 @@ pub fn try_reset<S: Storage, A: Api, Q: Querier>(
     count: i32,
 ) -> Result<HandleResponse, ContractError> {
     let api = &deps.api;
-    config(&mut deps.storage).update(|mut state| {
+    config(&mut deps.storage).update(|mut state| -> Result<_, ContractError> {
         if api.canonical_address(&info.sender)? != state.owner {
             return Err(ContractError::Unauthorized{});
         }
@@ -86,7 +87,7 @@ mod tests {
 
     #[test]
     fn proper_initialization() {
-        let mut deps = mock_dependencies(20, &[]);
+        let mut deps = mock_dependencies(&[]);
 
         let msg = InitMsg { count: 17 };
         let env = mock_env("creator", &coins(1000, "earth"));
@@ -103,7 +104,7 @@ mod tests {
 
     #[test]
     fn increment() {
-        let mut deps = mock_dependencies(20, &coins(2, "token"));
+        let mut deps = mock_dependencies(&coins(2, "token"));
 
         let msg = InitMsg { count: 17 };
         let env = mock_env("creator", &coins(2, "token"));
@@ -122,7 +123,7 @@ mod tests {
 
     #[test]
     fn reset() {
-        let mut deps = mock_dependencies(20, &coins(2, "token"));
+        let mut deps = mock_dependencies(&coins(2, "token"));
 
         let msg = InitMsg { count: 17 };
         let env = mock_env("creator", &coins(2, "token"));
