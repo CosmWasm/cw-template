@@ -1,41 +1,44 @@
 use cosmwasm_std::{
-    to_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse, Querier, StdError,
-    StdResult, Storage,
+    to_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse, MessageInfo, Querier,
+    StdError, StdResult, Storage,
 };
 
 use crate::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg};
 use crate::state::{config, config_read, State};
 
+// Note, you can use StdResult in some functions where you do not
+// make use of the custom errors
 pub fn init<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
-    env: Env,
+    _env: Env,
+    info: MessageInfo,
     msg: InitMsg,
 ) -> StdResult<InitResponse> {
     let state = State {
         count: msg.count,
-        owner: deps.api.canonical_address(&env.message.sender)?,
+        owner: deps.api.canonical_address(&info.sender)?,
     };
-
     config(&mut deps.storage).save(&state)?;
 
     Ok(InitResponse::default())
 }
 
+// And declare a custom Error variant for the ones where you will want to make use of it
 pub fn handle<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
-    env: Env,
+    _env: Env,
+    info: MessageInfo,
     msg: HandleMsg,
-) -> StdResult<HandleResponse> {
+) -> Result<HandleResponse, ContractError> {
     match msg {
-        HandleMsg::Increment {} => try_increment(deps, env),
-        HandleMsg::Reset { count } => try_reset(deps, env, count),
+        HandleMsg::Increment {} => try_increment(deps),
+        HandleMsg::Reset { count } => try_reset(deps, info, count),
     }
 }
 
 pub fn try_increment<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
-    _env: Env,
-) -> StdResult<HandleResponse> {
+) -> Result<HandleResponse, ContractError> {
     config(&mut deps.storage).update(|mut state| {
         state.count += 1;
         Ok(state)
@@ -46,13 +49,13 @@ pub fn try_increment<S: Storage, A: Api, Q: Querier>(
 
 pub fn try_reset<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
-    env: Env,
+    info: MessageInfo,
     count: i32,
-) -> StdResult<HandleResponse> {
+) -> Result<HandleResponse, ContractError> {
     let api = &deps.api;
     config(&mut deps.storage).update(|mut state| {
-        if api.canonical_address(&env.message.sender)? != state.owner {
-            return Err(StdError::unauthorized());
+        if api.canonical_address(&info.sender)? != state.owner {
+            return Err(ContractError::Unauthorized{});
         }
         state.count = count;
         Ok(state)
@@ -62,6 +65,7 @@ pub fn try_reset<S: Storage, A: Api, Q: Querier>(
 
 pub fn query<S: Storage, A: Api, Q: Querier>(
     deps: &Extern<S, A, Q>,
+    _env: Env,
     msg: QueryMsg,
 ) -> StdResult<Binary> {
     match msg {
