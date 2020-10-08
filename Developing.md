@@ -88,23 +88,9 @@ This is rather slow compared to local compilations, especially the first compile
 of a given contract. The use of the two volume caches is very useful to speed up
 following compiles of the same contract.
 
-This produces a `contract.wasm` file in the current directory (which must be the root
-directory of your rust project, the one with `Cargo.toml` inside). As well as
-`hash.txt` containing the Sha256 hash of `contract.wasm`, and it will rebuild
-your schema files as well.
-
-### Testing production build
-
-Once we have this compressed `contract.wasm`, we may want to ensure it is actually
-doing everything it is supposed to (as it is about 4% of the original size).
-If you update the "WASM" line in `tests/integration.rs`, it will run the integration
-steps on the optimized build, not just the normal build. I have never seen a different
-behavior, but it is nice to verify sometimes.
-
-```rust
-static WASM: &[u8] = include_bytes!("../contract.wasm");
-```
-
-Note that this is the same (deterministic) code you will be uploading to
-a blockchain to test it out, as we need to shrink the size and produce a
-clear mapping from wasm hash back to the source code.
+This produces an `artifacts` directory with a `PROJECT_NAME.wasm`, as well as
+`checksums.txt`, containing the Sha256 hash of the wasm file.
+The wasm file is compiled deterministically (anyone else running the same
+docker on the same git commit should get the identical file with the same Sha256 hash).
+It is also stripped and minimized for upload to a blockchain (we will also 
+gzip it in the uploading process to make it even smaller).

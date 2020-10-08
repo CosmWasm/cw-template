@@ -54,7 +54,7 @@ the don't belong to the source publication. However, they are excluded from pack
 in `Cargo.toml` which allows you to commit them to your git repository if you like.
 
 ```toml
-exclude = ["contract.wasm", "hash.txt"]
+exclude = ["artifacts"]
 ```
 
 A single source code can be built with multiple different optimizers, so
