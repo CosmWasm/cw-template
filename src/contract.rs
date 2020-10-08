@@ -1,9 +1,9 @@
 use cosmwasm_std::{
     to_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse, MessageInfo, Querier,
-    StdError, StdResult, Storage,
+    StdResult, Storage,
 };
 
-use crate::errors::MyCustomError;
+use crate::error::ContractError;
 use crate::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg};
 use crate::state::{config, config_read, State};
 
@@ -56,7 +56,7 @@ pub fn try_reset<S: Storage, A: Api, Q: Querier>(
     let api = &deps.api;
     config(&mut deps.storage).update(|mut state| -> Result<_, ContractError> {
         if api.canonical_address(&info.sender)? != state.owner {
-            return Err(ContractError::Unauthorized{});
+            return Err(ContractError::Unauthorized {});
         }
         state.count = count;
         Ok(state)
@@ -82,8 +82,8 @@ fn query_count<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> StdRes
 #[cfg(test)]
 mod tests {
     use super::*;
-    use cosmwasm_std::testing::{mock_dependencies, mock_env};
-    use cosmwasm_std::{coins, from_binary, StdError};
+    use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
+    use cosmwasm_std::{coins, from_binary};
 
     #[test]
     fn proper_initialization() {
@@ -93,11 +93,11 @@ mod tests {
         let info = mock_info("creator", &coins(1000, "earth"));
 
         // we can just call .unwrap() to assert this was a success
-        let res = init(&mut deps, mock_env(),info, msg).unwrap();
+        let res = init(&mut deps, mock_env(), info, msg).unwrap();
         assert_eq!(0, res.messages.len());
 
         // it worked, let's query the state
-        let res = query(&deps, mock_env(),QueryMsg::GetCount {}).unwrap();
+        let res = query(&deps, mock_env(), QueryMsg::GetCount {}).unwrap();
         let value: CountResponse = from_binary(&res).unwrap();
         assert_eq!(17, value.count);
     }
@@ -108,15 +108,15 @@ mod tests {
 
         let msg = InitMsg { count: 17 };
         let info = mock_info("creator", &coins(2, "token"));
-        let _res = init(&mut deps, mock_env(),info, msg).unwrap();
+        let _res = init(&mut deps, mock_env(), info, msg).unwrap();
 
         // beneficiary can release it
         let info = mock_info("anyone", &coins(2, "token"));
         let msg = HandleMsg::Increment {};
-        let _res = handle(&mut deps, mock_env(),info, msg).unwrap();
+        let _res = handle(&mut deps, mock_env(), info, msg).unwrap();
 
         // should increase counter by 1
-        let res = query(&deps, mock_env(),QueryMsg::GetCount {}).unwrap();
+        let res = query(&deps, mock_env(), QueryMsg::GetCount {}).unwrap();
         let value: CountResponse = from_binary(&res).unwrap();
         assert_eq!(18, value.count);
     }
@@ -127,24 +127,24 @@ mod tests {
 
         let msg = InitMsg { count: 17 };
         let info = mock_info("creator", &coins(2, "token"));
-        let _res = init(&mut deps, mock_env(),info, msg).unwrap();
+        let _res = init(&mut deps, mock_env(), info, msg).unwrap();
 
         // beneficiary can release it
         let unauth_info = mock_info("anyone", &coins(2, "token"));
         let msg = HandleMsg::Reset { count: 5 };
-        let res = handle(&mut deps, mock_env(),unauth_info, msg);
+        let res = handle(&mut deps, mock_env(), unauth_info, msg);
         match res {
-            Err(StdError::Unauthorized { .. }) => {}
+            Err(ContractError::Unauthorized {}) => {}
             _ => panic!("Must return unauthorized error"),
         }
 
         // only the original creator can reset the counter
         let auth_info = mock_info("creator", &coins(2, "token"));
         let msg = HandleMsg::Reset { count: 5 };
-        let _res = handle(&mut deps, mock_env(),auth_info, msg).unwrap();
+        let _res = handle(&mut deps, mock_env(), auth_info, msg).unwrap();
 
         // should now be 5
-        let res = query(&deps, mock_env(),QueryMsg::GetCount {}).unwrap();
+        let res = query(&deps, mock_env(), QueryMsg::GetCount {}).unwrap();
         let value: CountResponse = from_binary(&res).unwrap();
         assert_eq!(5, value.count);
     }
