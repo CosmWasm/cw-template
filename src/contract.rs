@@ -6,7 +6,7 @@ use cw2::set_contract_version;
 
 use crate::error::ContractError;
 use crate::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg};
-use crate::state::{config, config_read, State};
+use crate::state::{State, CONFIG};
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:{{project-name}}";
@@ -26,7 +26,7 @@ pub fn init<S: Storage, A: Api, Q: Querier>(
         count: msg.count,
         owner: deps.api.canonical_address(&info.sender)?,
     };
-    config(&mut deps.storage).save(&state)?;
+    CONFIG.save(&mut deps.storage, &state)?;
 
     Ok(InitResponse::default())
 }
@@ -47,7 +47,7 @@ pub fn handle<S: Storage, A: Api, Q: Querier>(
 pub fn try_increment<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
 ) -> Result<HandleResponse, ContractError> {
-    config(&mut deps.storage).update(|mut state| -> Result<_, ContractError> {
+    CONFIG.update(&mut deps.storage, |mut state| -> Result<_, ContractError> {
         state.count += 1;
         Ok(state)
     })?;
@@ -61,7 +61,7 @@ pub fn try_reset<S: Storage, A: Api, Q: Querier>(
     count: i32,
 ) -> Result<HandleResponse, ContractError> {
     let api = &deps.api;
-    config(&mut deps.storage).update(|mut state| -> Result<_, ContractError> {
+    CONFIG.update(&mut deps.storage, |mut state| -> Result<_, ContractError> {
         if api.canonical_address(&info.sender)? != state.owner {
             return Err(ContractError::Unauthorized {});
         }
@@ -82,7 +82,7 @@ pub fn query<S: Storage, A: Api, Q: Querier>(
 }
 
 fn query_count<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> StdResult<CountResponse> {
-    let state = config_read(&deps.storage).load()?;
+    let state = CONFIG.load(&deps.storage)?;
     Ok(CountResponse { count: state.count })
 }
 
