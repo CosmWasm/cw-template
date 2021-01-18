@@ -10,7 +10,7 @@
 image: Ubuntu
 
 environment:
-  TOOLCHAIN: 1.44.1
+  TOOLCHAIN: 1.47.0
 
 cache:
   - $HOME/.rustup/ -> meta/appveyor.yml
