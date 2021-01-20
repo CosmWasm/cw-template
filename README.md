@@ -9,7 +9,7 @@ This assumes you understand the theory and just want to get coding.
 
 ## Creating a new repo from template
 
-Assuming you have a recent version of rust and cargo (v1.44.1+) installed
+Assuming you have a recent version of rust and cargo (v1.47.0+) installed
 (via [rustup](https://rustup.rs/)),
 then the following should get you a new repo to start a contract:
 
