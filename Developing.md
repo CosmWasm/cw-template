@@ -103,17 +103,17 @@ produce an extremely small build output in a consistent manner. The suggest way
 to run it is this:
 
 ```sh
-docker run --rm -v "$(pwd)":/code \
-  --mount type=volume,source="$(basename "$(pwd)")_cache",target=/code/target \
-  --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
-  cosmwasm/rust-optimizer:0.8.0
+docker run --rm -v "$$(pwd)":/contract \
+    --mount type=volume,source="$$(basename "$$(pwd)")_cache",target=/contract/target \
+    --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
+    enigmampc/secret-contract-optimizer:1.0.3
 ```
 
-We must mount the contract code to `/code`. You can use a absolute path instead
+We must mount the contract code to `/contract`. You can use an absolute path instead
 of `$(pwd)` if you don't want to `cd` to the directory first. The other two
-volumes are nice for speedup. Mounting `/code/target` in particular is useful
+volumes are nice for speedup. Mounting `/contract/target` in particular is useful
 to avoid docker overwriting your local dev files with root permissions.
-Note the `/code/target` cache is unique for each contract being compiled to limit
+Note the `/contract/target` cache is unique for each contract being compiled to limit
 interference, while the registry cache is global.
 
 This is rather slow compared to local compilations, especially the first compile

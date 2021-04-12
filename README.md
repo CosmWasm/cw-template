@@ -58,6 +58,9 @@ to the world, once you are ready to deploy it on a running blockchain. And
 [Importing](./Importing.md) contains information about pulling in other contracts or crates
 that have been published.
 
+You can also find lots of useful recipes in the `Makefile` which you can use
+if you have `make` installed (very recommended. at least check them out).
+
 Please replace this README file with information about your specific project. You can keep
 the `Developing.md` and `Publishing.md` files as useful referenced, but please set some
 proper description in the README.
