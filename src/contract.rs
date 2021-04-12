@@ -1,6 +1,6 @@
 use cosmwasm_std::{
-    to_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse, Querier, StdError,
-    StdResult, Storage,
+    debug_print, to_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse, Querier,
+    StdError, StdResult, Storage,
 };
 
 use crate::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg};
@@ -17,6 +17,8 @@ pub fn init<S: Storage, A: Api, Q: Querier>(
     };
 
     config(&mut deps.storage).save(&state)?;
+
+    debug_print!("Contract was initialized by {}", env.message.sender);
 
     Ok(InitResponse::default())
 }
@@ -38,9 +40,11 @@ pub fn try_increment<S: Storage, A: Api, Q: Querier>(
 ) -> StdResult<HandleResponse> {
     config(&mut deps.storage).update(|mut state| {
         state.count += 1;
+        debug_print!("count = {}", state.count);
         Ok(state)
     })?;
 
+    debug_print("count incremented successfully");
     Ok(HandleResponse::default())
 }
 
@@ -57,6 +61,7 @@ pub fn try_reset<S: Storage, A: Api, Q: Querier>(
         state.count = count;
         Ok(state)
     })?;
+    debug_print("count reset successfully");
     Ok(HandleResponse::default())
 }
 
