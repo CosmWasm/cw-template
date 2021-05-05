@@ -33,7 +33,5 @@ PROJECT_NAME="testgen-local"
 
     echo "Building wasm ..."
     cargo wasm
-    echo "Running integration tests ..."
-    cargo integration-test
   )
 )
