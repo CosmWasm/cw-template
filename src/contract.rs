@@ -3,7 +3,7 @@ use cosmwasm_std::{
 };
 
 use crate::error::ContractError;
-use crate::msg::{CountResponse, HandleMsg, InstantiateMsg, QueryMsg};
+use crate::msg::{CountResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{config, config_read, State};
 
 // Note, you can use StdResult in some functions where you do not
@@ -30,11 +30,11 @@ pub fn execute(
     deps: DepsMut,
     _env: Env,
     info: MessageInfo,
-    msg: HandleMsg,
+    msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
     match msg {
-        HandleMsg::Increment {} => try_increment(deps),
-        HandleMsg::Reset { count } => try_reset(deps, info, count),
+        ExecuteMsg::Increment {} => try_increment(deps),
+        ExecuteMsg::Reset { count } => try_reset(deps, info, count),
     }
 }
 
@@ -103,7 +103,7 @@ mod tests {
 
         // beneficiary can release it
         let info = mock_info("anyone", &coins(2, "token"));
-        let msg = HandleMsg::Increment {};
+        let msg = ExecuteMsg::Increment {};
         let _res = execute(deps.as_mut(), mock_env(), info, msg).unwrap();
 
         // should increase counter by 1
@@ -122,7 +122,7 @@ mod tests {
 
         // beneficiary can release it
         let unauth_info = mock_info("anyone", &coins(2, "token"));
-        let msg = HandleMsg::Reset { count: 5 };
+        let msg = ExecuteMsg::Reset { count: 5 };
         let res = execute(deps.as_mut(), mock_env(), unauth_info, msg);
         match res {
             Err(ContractError::Unauthorized {}) => {}
@@ -131,7 +131,7 @@ mod tests {
 
         // only the original creator can reset the counter
         let auth_info = mock_info("creator", &coins(2, "token"));
-        let msg = HandleMsg::Reset { count: 5 };
+        let msg = ExecuteMsg::Reset { count: 5 };
         let _res = execute(deps.as_mut(), mock_env(), auth_info, msg).unwrap();
 
         // should now be 5
