@@ -49,7 +49,7 @@ the tests up to date.
 
 ## Generating JSON Schema
 
-While the Wasm calls (`init`, `handle`, `query`) accept JSON, this is not enough
+While the Wasm calls (`instantiate`, `execute`, `query`) accept JSON, this is not enough
 information to use it. We need to expose the schema for the expected messages to the
 clients. You can generate this schema by calling `cargo schema`, which will output
 4 files in `./schema`, corresponding to the 3 message types the contract accepts,
