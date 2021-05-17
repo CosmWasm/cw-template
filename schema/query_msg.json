@@ -11,7 +11,8 @@
         "get_count": {
           "type": "object"
         }
-      }
+      },
+      "additionalProperties": false
     }
   ]
 }
