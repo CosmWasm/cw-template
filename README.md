@@ -78,7 +78,7 @@ Then run the following:
 ```sh
 # this is needed to create a valid Cargo.lock file (see below)
 cargo check
-git checkout -b master # in case you generate from non-master
+git branch -M main
 git add .
 git commit -m 'Initial Commit'
 git remote add origin YOUR-GIT-URL

@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: rust:1.44.1
+      - image: rust:1.51.0
     steps:
       - checkout
       - run:
@@ -15,6 +15,9 @@ jobs:
       - run:
           name: Add wasm32 target
           command: rustup target add wasm32-unknown-unknown
+      - run:
+          name: Add cargo fmt
+          command: rustup component add rustfmt
       - run:
           name: Unit tests
           env: RUST_BACKTRACE=1
