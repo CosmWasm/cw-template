@@ -16,6 +16,9 @@ jobs:
           name: Add wasm32 target
           command: rustup target add wasm32-unknown-unknown
       - run:
+          name: Add cargo fmt
+          command: rustup component add rustfmt
+      - run:
           name: Unit tests
           env: RUST_BACKTRACE=1
           command: cargo unit-test --locked
