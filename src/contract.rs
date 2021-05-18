@@ -4,7 +4,7 @@ use cosmwasm_std::{
 
 use crate::error::ContractError;
 use crate::msg::{CountResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::state::{config, config_read, State};
+use crate::state::State;
 
 // Note, you can use StdResult in some functions where you do not
 // make use of the custom errors
