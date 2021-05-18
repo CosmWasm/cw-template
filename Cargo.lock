@@ -134,15 +134,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "demo1"
-version = "0.1.0"
+name = "cw-storage-plus"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b427ab9149bbc8ef9535ba66ae3c6595215710b9e2081167517845e12d38013"
 dependencies = [
- "cosmwasm-schema",
  "cosmwasm-std",
- "cosmwasm-storage",
  "schemars",
  "serde",
- "thiserror",
 ]
 
 [[package]]
@@ -468,6 +467,19 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-xid",
+]
+
+[[package]]
+name = "testgen-local"
+version = "0.1.0"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cosmwasm-storage",
+ "cw-storage-plus",
+ "schemars",
+ "serde",
+ "thiserror",
 ]
 
 [[package]]

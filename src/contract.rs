@@ -4,7 +4,7 @@ use cosmwasm_std::{
 
 use crate::error::ContractError;
 use crate::msg::{CountResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::state::{config, config_read, State};
+use crate::state::{State, STATE};
 
 // Note, you can use StdResult in some functions where you do not
 // make use of the custom errors
@@ -19,7 +19,7 @@ pub fn instantiate(
         count: msg.count,
         owner: info.sender,
     };
-    config(deps.storage).save(&state)?;
+    STATE.save(deps.storage, &state)?;
 
     Ok(Response::default())
 }
@@ -39,7 +39,7 @@ pub fn execute(
 }
 
 pub fn try_increment(deps: DepsMut) -> Result<Response, ContractError> {
-    config(deps.storage).update(|mut state| -> Result<_, ContractError> {
+    STATE.update(deps.storage, |mut state| -> Result<_, ContractError> {
         state.count += 1;
         Ok(state)
     })?;
@@ -48,7 +48,7 @@ pub fn try_increment(deps: DepsMut) -> Result<Response, ContractError> {
 }
 
 pub fn try_reset(deps: DepsMut, info: MessageInfo, count: i32) -> Result<Response, ContractError> {
-    config(deps.storage).update(|mut state| -> Result<_, ContractError> {
+    STATE.update(deps.storage, |mut state| -> Result<_, ContractError> {
         if info.sender != state.owner {
             return Err(ContractError::Unauthorized {});
         }
@@ -66,7 +66,7 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
 }
 
 fn query_count(deps: Deps) -> StdResult<CountResponse> {
-    let state = config_read(deps.storage).load()?;
+    let state = STATE.load(deps.storage)?;
     Ok(CountResponse { count: state.count })
 }
 
