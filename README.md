@@ -41,7 +41,7 @@ cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 
 
 Example:
 
-```shell
+```sh
 cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.14 --name PROJECT_NAME
 ```
 
