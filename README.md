@@ -25,45 +25,24 @@ Now, use it to create your new contract.
 Go to the folder in which you want to place it and run:
 
 
-**0.14 (latest)**
+**Latest: 0.15**
 
 ```sh
 cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --name PROJECT_NAME
 ````
 
-**0.13**
+**Older Version**
+
+Pass version as branch flag:
 
 ```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.13 --name PROJECT_NAME
+cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch <version> --name PROJECT_NAME
 ````
 
-**0.12**
+Example:
 
-```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.12 --name PROJECT_NAME
-```
-
-**0.11**
-
-```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.11 --name PROJECT_NAME
-```
-**0.10**
-
-```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.10 --name PROJECT_NAME
-```
-
-**0.9**
-
-```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.9 --name PROJECT_NAME
-```
-
-**0.8**
-
-```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.8 --name PROJECT_NAME
+```shell
+cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.14 --name PROJECT_NAME
 ```
 
 You will now have a new folder called `PROJECT_NAME` (I hope you changed that to something else)
