@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: rust:1.51.0
+      - image: rust:1.53.0
     steps:
       - checkout
       - run:
