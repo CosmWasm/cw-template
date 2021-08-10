@@ -25,7 +25,7 @@ Now, use it to create your new contract.
 Go to the folder in which you want to place it and run:
 
 
-**Latest: 0.15**
+**Latest: 0.16**
 
 ```sh
 cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --name PROJECT_NAME
