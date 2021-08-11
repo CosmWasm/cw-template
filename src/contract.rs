@@ -19,7 +19,7 @@ pub fn instantiate(
     };
     STATE.save(deps.storage, &state)?;
 
-    Ok(Response::default())
+    Ok(Response::new())
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
@@ -41,7 +41,7 @@ pub fn try_increment(deps: DepsMut) -> Result<Response, ContractError> {
         Ok(state)
     })?;
 
-    Ok(Response::default())
+    Ok(Response::new())
 }
 
 pub fn try_reset(deps: DepsMut, info: MessageInfo, count: i32) -> Result<Response, ContractError> {
@@ -52,7 +52,7 @@ pub fn try_reset(deps: DepsMut, info: MessageInfo, count: i32) -> Result<Respons
         state.count = count;
         Ok(state)
     })?;
-    Ok(Response::default())
+    Ok(Response::new())
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
