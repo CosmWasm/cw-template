@@ -19,11 +19,10 @@ pub fn instantiate(
     };
     STATE.save(deps.storage, &state)?;
 
-    Ok(Response::new().add_attributes([
-        ("method", "instantiate"),
-        ("owner", &info.sender.to_string()),
-        ("count", &msg.count.to_string()),
-    ]))
+    Ok(Response::new()
+        .add_attribute("method", "instantiate")
+        .add_attribute("owner", info.sender)
+        .add_attribute("count", msg.count.to_string()))
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
