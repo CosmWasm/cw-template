@@ -3,7 +3,7 @@ image:
 
 vscode:
   extensions:
-    - swellaby.rust-pack
+    - rust-lang.rust
 
 tasks:
   - name: Dependencies & Build
