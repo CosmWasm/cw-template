@@ -92,3 +92,8 @@ that have been published.
 Please replace this README file with information about your specific project. You can keep
 the `Developing.md` and `Publishing.md` files as useful referenced, but please set some
 proper description in the README.
+
+## Gitpod integration
+
+[Gitpod](https://www.gitpod.io/) container-based development platform will be enabled on your project by default.
+Follow [Gitpod Getting Started](https://www.gitpod.io/docs/getting-started) launch your workspace.
