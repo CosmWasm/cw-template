@@ -8,3 +8,5 @@ tasks:
   - name: Dependencies & Build
     init: |
       cargo build
+  - name: Setup Environment
+    command: source <(curl -sSL https://raw.githubusercontent.com/CosmWasm/testnets/master/oysternet-1/defaults.env)

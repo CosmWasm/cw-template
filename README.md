@@ -101,6 +101,8 @@ Workspace contains:
  - **rust**: for builds
  - [wasmd](https://github.com/CosmWasm/wasmd): for local node setup and client
  - **jq**: shell JSON manipulation tool
+ - **Testnet setup**: as environment variables: [reference setu](https://raw.githubusercontpent.
+   com/CosmWasm/testnets/master/oysternet-1/defaults.env)
 
 Follow [Gitpod Getting Started](https://www.gitpod.io/docs/getting-started) and launch your workspace.
 
