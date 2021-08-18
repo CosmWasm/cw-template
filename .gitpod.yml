@@ -1,4 +1,4 @@
-image: cosmwasm/cw-gitpod-base:0.16
+image: cosmwasm/cw-gitpod-base:v0.16.0
 
 vscode:
   extensions:
