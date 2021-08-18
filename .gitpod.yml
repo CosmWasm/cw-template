@@ -1,5 +1,4 @@
-image:
-  file: .gitpod.Dockerfile
+image: cosmwasm/cw-gitpod-base:0.16
 
 vscode:
   extensions:
