@@ -1,52 +1,61 @@
 version: 2.1
 
-jobs:
-  build:
+executors:
+  builder:
     docker:
-      - image: rust:1.53.0
+      - image: buildpack-deps:trusty
+
+jobs:
+  docker-image:
+    executor: builder
     steps:
       - checkout
+      - setup_remote_docker
+        docker_layer_caching: true
       - run:
-          name: Version information
-          command: rustc --version; cargo --version; rustup --version
-      - restore_cache:
-          keys:
-            - v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
+          name: Build Docker artifact
+          command: docker build --pull -t "cosmwasm/cw-gitpod-base:${CIRCLE_SHA1}" .
       - run:
-          name: Add wasm32 target
-          command: rustup target add wasm32-unknown-unknown
-      - run:
-          name: Add cargo fmt
-          command: rustup component add rustfmt
-      - run:
-          name: Unit tests
-          env: RUST_BACKTRACE=1
-          command: cargo unit-test --locked
-      - run:
-          name: Build
-          command: cargo wasm --locked
-      - run:
-          name: Format source code
-          command: cargo fmt
-      - run:
-          name: Build and run schema generator
-          command: cargo schema --locked
-      - run:
-          name: Ensure checked-in source code and schemas are up-to-date
+          name: Push application Docker image to docker hub
           command: |
-            CHANGES_IN_REPO=$(git status --porcelain)
-            if [[ -n "$CHANGES_IN_REPO" ]]; then
-              echo "Repository is dirty. Showing 'git status' and 'git --no-pager diff' for debugging now:"
-              git status && git --no-pager diff
-              exit 1
+            if [ "${CIRCLE_BRANCH}" = "master" ]; then
+              docker tag "cosmwasm/cw-gitpod-base:${CIRCLE_SHA1}" cosmwasm/cw-gitpod-base:latest
+              docker login --password-stdin -u "$DOCKER_USER" \<<<"$DOCKER_PASS"
+              docker push cosmwasm/cw-gitpod-base:latest
+              docker logout
             fi
-      - save_cache:
-          paths:
-            - /usr/local/cargo/registry
-            - target/debug/.fingerprint
-            - target/debug/build
-            - target/debug/deps
-            - target/wasm32-unknown-unknown/release/.fingerprint
-            - target/wasm32-unknown-unknown/release/build
-            - target/wasm32-unknown-unknown/release/deps
-          key: v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
+
+  docker-tagged:
+    executor: builder
+    steps:
+      - checkout
+      - setup_remote_docker
+        docker_layer_caching: true
+      - run:
+          name: Push application Docker image to docker hub
+          command: |
+            docker tag "cosmwasm/cw-gitpod-base:${CIRCLE_SHA1}" "cosmwasm/cw-gitpod-base:${CIRCLE_TAG}"
+            docker login --password-stdin -u "$DOCKER_USER" \<<<"$DOCKER_PASS"
+            docker push
+            docker logout
+
+workflows:
+  version: 2
+  test-suite:
+    jobs:
+      # this is now a slow process... let's only run on master
+      - docker-image:
+          filters:
+            branches:
+              only:
+                - master
+      - docker-tagged:
+          filters:
+            tags:
+              only:
+                - /^v.*/
+            branches:
+              ignore:
+                - /.*/
+            requires:
+              - docker-image

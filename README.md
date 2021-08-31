@@ -96,4 +96,11 @@ proper description in the README.
 ## Gitpod integration
 
 [Gitpod](https://www.gitpod.io/) container-based development platform will be enabled on your project by default.
-Follow [Gitpod Getting Started](https://www.gitpod.io/docs/getting-started) launch your workspace.
+
+Workspace contains:
+ - **rust**: for builds
+ - [wasmd](https://github.com/CosmWasm/wasmd): for local node setup and client
+ - **jq**: shell JSON manipulation tool
+
+Follow [Gitpod Getting Started](https://www.gitpod.io/docs/getting-started) and launch your workspace.
+
