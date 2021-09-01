@@ -4,7 +4,7 @@
 # 2. the template files are up to date
 #
 # We chose Appveyor for this task as it allows us to use an arbitrary config
-# location. Furthermore it allows us to ship a Circle CI and Travis config
+# location. Furthermore it allows us to ship Circle CI and GitHub Actions configs
 # generated for the resulting project.
 
 image: Ubuntu
