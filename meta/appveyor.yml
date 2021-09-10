@@ -1,4 +1,4 @@
-# This CI configuration tests the cosmwasm-template repository itself,
+# This CI configuration tests the cw-template repository itself,
 # not the resulting project. We want to ensure that
 # 1. the template to project generation works
 # 2. the template files are up to date
@@ -34,7 +34,7 @@ build_script:
   # cargo generate.
   - git branch current-ci-checkout
   - cd ..
-  - cargo generate --git cosmwasm-template --name testgen-ci --branch current-ci-checkout
+  - cargo generate --git cw-template --name testgen-ci --branch current-ci-checkout
   - cd testgen-ci
   - ls -lA
   - cargo fmt -- --check
