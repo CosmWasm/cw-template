@@ -28,7 +28,7 @@ Go to the folder in which you want to place it and run:
 **Latest: 0.16**
 
 ```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --name PROJECT_NAME
+cargo generate --git https://github.com/CosmWasm/cw-template.git --name PROJECT_NAME
 ````
 
 **Older Version**
@@ -36,13 +36,13 @@ cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --name PR
 Pass version as branch flag:
 
 ```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch <version> --name PROJECT_NAME
+cargo generate --git https://github.com/CosmWasm/cw-template.git --branch <version> --name PROJECT_NAME
 ````
 
 Example:
 
 ```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.14 --name PROJECT_NAME
+cargo generate --git https://github.com/CosmWasm/cw-template.git --branch 0.14 --name PROJECT_NAME
 ```
 
 You will now have a new folder called `PROJECT_NAME` (I hope you changed that to something else)
