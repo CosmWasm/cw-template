@@ -27,25 +27,25 @@ Go to the folder in which you want to place it and run:
 **0.11 (latest)**
 
 ```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --name PROJECT_NAME
+cargo generate --git https://github.com/CosmWasm/cw-template.git --name PROJECT_NAME
 ```
 
 **0.10**
 
 ```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.10 --name PROJECT_NAME
+cargo generate --git https://github.com/CosmWasm/cw-template.git --branch 0.10 --name PROJECT_NAME
 ```
 
 **0.9**
 
 ```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.9 --name PROJECT_NAME
+cargo generate --git https://github.com/CosmWasm/cw-template.git --branch 0.9 --name PROJECT_NAME
 ```
 
 **0.8**
 
 ```sh
-cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --branch 0.8 --name PROJECT_NAME
+cargo generate --git https://github.com/CosmWasm/cw-template.git --branch 0.8 --name PROJECT_NAME
 ```
 
 You will now have a new folder called `PROJECT_NAME` (I hope you changed that to something else)
