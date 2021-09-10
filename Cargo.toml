@@ -6,7 +6,6 @@ edition = "2018"
 
 exclude = [
   # Those files are rust-optimizer artifacts. You might want to commit them for convenience but they should not be part of the source code publication.
-  "contract.wasm",
   "hash.txt",
 ]
 
@@ -14,17 +13,6 @@ exclude = [
 
 [lib]
 crate-type = ["cdylib", "rlib"]
-
-[profile.release]
-opt-level = 3
-debug = false
-rpath = false
-lto = true
-debug-assertions = false
-codegen-units = 1
-panic = 'abort'
-incremental = false
-overflow-checks = true
 
 [features]
 # for more explicit tests, cargo test --features=backtraces
@@ -34,9 +22,8 @@ library = []
 
 [dependencies]
 cosmwasm-std = { version = "0.16.2" }
-cosmwasm-storage = { version = "0.16.0" }
-cw-storage-plus = "0.8.0"
-cw2 = "0.8.1"
+cw2 = { path = "../../packages/cw2", version = "0.8.1" }
+cw-storage-plus = { path = "../../packages/storage-plus", version = "0.8.1", features = ["iterator"] }
 schemars = "0.8.3"
 serde = { version = "1.0.127", default-features = false, features = ["derive"] }
 thiserror = { version = "1.0.26" }
