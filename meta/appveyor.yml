@@ -32,7 +32,7 @@ install:
   - cargo install --features vendored-openssl cargo-generate || true
 
 build_script:
-  # No matter what is currently checked out by the CI (master, other branch, PR merge commit),
+  # No matter what is currently checked out by the CI (main, other branch, PR merge commit),
   # we create a temporary local branch from that point with a constant name, which we need for
   # cargo generate.
   - git branch current-ci-checkout
@@ -45,7 +45,7 @@ build_script:
   - cargo wasm
   - cargo schema
   - docker build --pull -t "cosmwasm/cw-gitpod-base:${APPVEYOR_REPO_COMMIT}" .
-  - \[ "${APPVEYOR_REPO_BRANCH}" = "master" \] && image_tag=latest || image_tag=${APPVEYOR_REPO_TAG_NAME}
+  - \[ "${APPVEYOR_REPO_BRANCH}" = "main" \] && image_tag=latest || image_tag=${APPVEYOR_REPO_TAG_NAME}
   - docker tag "cosmwasm/cw-gitpod-base:${APPVEYOR_REPO_COMMIT}" "cosmwasm/cw-gitpod-base:${image_tag}"
 
 on_success:
@@ -57,5 +57,5 @@ on_success:
 # whitelist long living branches
 branches:
   only:
-    - master
+    - main
     - /^v.*/
