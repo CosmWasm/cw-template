@@ -54,8 +54,8 @@ on_success:
   - docker push
   - docker logout
 
-# whitelist long living branches
 branches:
+# whitelist long living branches and tags
   only:
     - main
-    - /^v.*/
+    - /v\d+\.\d+\.\d+/
