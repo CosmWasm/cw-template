@@ -12,6 +12,9 @@ image: Ubuntu
 environment:
   TOOLCHAIN: 1.51.0
 
+services:
+  - docker
+
 cache:
   - $HOME/.rustup/ -> meta/appveyor.yml
   # For details about cargo caching see https://doc.rust-lang.org/cargo/guide/cargo-home.html#caching-the-cargo-home-in-ci
@@ -29,7 +32,7 @@ install:
   - cargo install --features vendored-openssl cargo-generate || true
 
 build_script:
-  # No matter what is currently checked out by the CI (master, other branch, PR merge commit),
+  # No matter what is currently checked out by the CI (main, other branch, PR merge commit),
   # we create a temporary local branch from that point with a constant name, which we need for
   # cargo generate.
   - git branch current-ci-checkout
@@ -41,8 +44,18 @@ build_script:
   - cargo unit-test
   - cargo wasm
   - cargo schema
+  - docker build --pull -t "cosmwasm/cw-gitpod-base:${APPVEYOR_REPO_COMMIT}" .
+  - \[ "${APPVEYOR_REPO_BRANCH}" = "main" \] && image_tag=latest || image_tag=${APPVEYOR_REPO_TAG_NAME}
+  - docker tag "cosmwasm/cw-gitpod-base:${APPVEYOR_REPO_COMMIT}" "cosmwasm/cw-gitpod-base:${image_tag}"
 
-# whitelist long living branches
+on_success:
+  # publish docker image
+  - docker login --password-stdin -u "$DOCKER_USER" <<<"$DOCKER_PASS"
+  - docker push
+  - docker logout
+
 branches:
+# whitelist long living branches and tags
   only:
-    - master
+    # - main
+    - /v\d+\.\d+\.\d+/
