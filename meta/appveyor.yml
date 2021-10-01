@@ -57,5 +57,5 @@ on_success:
 branches:
 # whitelist long living branches and tags
   only:
-    - main
+    # - main
     - /v\d+\.\d+\.\d+/
