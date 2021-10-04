@@ -13,12 +13,12 @@ Assuming you have a recent version of rust and cargo (v1.51.0+) installed
 (via [rustup](https://rustup.rs/)),
 then the following should get you a new repo to start a contract:
 
-First, install
-[cargo-generate](https://github.com/ashleygwilliams/cargo-generate).
+
+Install [cargo-generate](https://github.com/ashleygwilliams/cargo-generate) and cargo-run-script.
 Unless you did that before, run this line now:
 
 ```sh
-cargo install cargo-generate --features vendored-openssl
+cargo install cargo-generate cargo-run-script --features vendored-openssl 
 ```
 
 Now, use it to create your new contract.
