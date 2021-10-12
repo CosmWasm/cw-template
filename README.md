@@ -27,7 +27,7 @@ Now, use it to create your new contract.
 Go to the folder in which you want to place it and run:
 
 
-**Latest: 0.16**
+**Latest: 1.0.0-beta**
 
 ```sh
 cargo generate --git https://github.com/CosmWasm/cw-template.git --name PROJECT_NAME
@@ -44,7 +44,7 @@ cargo generate --git https://github.com/CosmWasm/cw-template.git --branch <versi
 Example:
 
 ```sh
-cargo generate --git https://github.com/CosmWasm/cw-template.git --branch 0.14 --name PROJECT_NAME
+cargo generate --git https://github.com/CosmWasm/cw-template.git --branch 0.16 --name PROJECT_NAME
 ```
 
 You will now have a new folder called `PROJECT_NAME` (I hope you changed that to something else)
