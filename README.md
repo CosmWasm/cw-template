@@ -63,7 +63,7 @@ git branch -M main
 git add .
 git commit -m 'Initial Commit'
 git remote add origin YOUR-GIT-URL
-git push -u origin master
+git push -u origin main
 ```
 
 ## CI Support
