@@ -83,7 +83,7 @@ mod tests {
 
     #[test]
     fn proper_initialization() {
-        let mut deps = mock_dependencies(&[]);
+        let mut deps = mock_dependencies();
 
         let msg = InstantiateMsg { count: 17 };
         let info = mock_info("creator", &coins(1000, "earth"));
@@ -100,7 +100,7 @@ mod tests {
 
     #[test]
     fn increment() {
-        let mut deps = mock_dependencies(&coins(2, "token"));
+        let mut deps = mock_dependencies();
 
         let msg = InstantiateMsg { count: 17 };
         let info = mock_info("creator", &coins(2, "token"));
@@ -119,7 +119,7 @@ mod tests {
 
     #[test]
     fn reset() {
-        let mut deps = mock_dependencies(&coins(2, "token"));
+        let mut deps = mock_dependencies();
 
         let msg = InstantiateMsg { count: 17 };
         let info = mock_info("creator", &coins(2, "token"));
