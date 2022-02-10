@@ -50,7 +50,7 @@ multiple contracts and label it like `escrow-0.1.0`. Don't forget a
 ### Note on build results
 
 Build results like Wasm bytecode or expected hash don't need to be updated since
-the don't belong to the source publication. However, they are excluded from packaging
+they don't belong to the source publication. However, they are excluded from packaging
 in `Cargo.toml` which allows you to commit them to your git repository if you like.
 
 ```toml
