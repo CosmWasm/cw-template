@@ -64,9 +64,6 @@ jobs:
           command: clippy
           args: -- -D warnings
 
-      # TODO: we should check
-      # CHANGES_IN_REPO=$(git status --porcelain)
-      # after this, but I don't know how
       - name: Generate Schema
         uses: actions-rs/cargo@v1
         with:
@@ -74,5 +71,5 @@ jobs:
           args: --locked
 
       - name: Schema Changes
-        # fails if any changes
+        # fails if any changes not committed
         run: git diff --exit-code schema
