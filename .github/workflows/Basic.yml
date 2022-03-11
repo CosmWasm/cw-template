@@ -72,3 +72,7 @@ jobs:
         with:
           command: schema
           args: --locked
+
+      - name: Schema Changes
+        # fails if any changes
+        run: git diff --exit-code schema
