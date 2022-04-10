@@ -99,6 +99,19 @@ async function getScrtBalance(userCli: SecretNetworkClient): Promise<string> {
   return balanceResponse.balance!.amount;
 }
 
+async function fillUpFromFaucet(client, targetBalance) {
+  let balance = await getScrtBalance(client);
+  while (Number(balance) < targetBalance) {
+    try {
+      await getFromFaucet(client.address);
+    } catch (e) {
+      console.error(`failed to get tokens from faucet: ${e}`);
+    }
+    balance = await getScrtBalance(client);
+  }
+  console.error(`got tokens from faucet: ${balance}`);
+}
+
 // Initialization procedure
 async function initializeAndUploadContract() {
   let endpoint = "http://localhost:9091";
@@ -106,18 +119,8 @@ async function initializeAndUploadContract() {
 
   const client = await initializeClient(endpoint, chainId);
 
-  let balance = await getScrtBalance(client);
-  while (Number(balance) < 100000000) {
-    // Collect enough USCRT to run our tests (Pay for gas and for instantiating the contract)
-    try {
-      await getFromFaucet(client.address); // This function might fail several times, nothing to worry about
-    } catch (e) {
-      console.log(`failed to get tokens from faucet: ${e}`);
-    }
-    balance = await getScrtBalance(client);
-  }
+  await fillUpFromFaucet(client, 100_000_000);
 
-  console.log(`got tokens from faucet: ${balance}`);
   const [contractHash, contractAddress] = await initializeContract(
     client,
     "contract.wasm"
