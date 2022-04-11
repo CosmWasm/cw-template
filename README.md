@@ -30,6 +30,8 @@ cargo generate --git https://github.com/enigmampc/secret-template.git --name YOU
 You will now have a new folder called `YOUR_NAME_HERE` (I hope you changed that to something else)
 containing a simple working contract and build system that you can customize.
 
+Don't forget to change the `name` and the `authors` fields in the `Cargo.toml` file.
+
 ## Create a Repo
 
 After generating, you have a initialized local git repo, but no commits, and no remote.
