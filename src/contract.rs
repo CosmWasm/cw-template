@@ -61,7 +61,7 @@ pub fn try_reset(deps: DepsMut, info: MessageInfo, count: i32) -> Result<Respons
         state.count = count;
         Ok(state)
     })?;
-    Ok(Response::new().add_attribute("method", "reset"))
+    Ok(Response::new().add_attribute("method", "try_reset"))
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
