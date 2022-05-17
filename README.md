@@ -25,11 +25,17 @@ Now, use it to create your new contract.
 Go to the folder in which you want to place it and run:
 
 
-**Latest: 1.0.0-beta6**
+**Latest: 1.0.0**
 
 ```sh
 cargo generate --git https://github.com/CosmWasm/cw-template.git --name PROJECT_NAME
 ````
+
+For cloning minimal code repo:
+
+```sh
+cargo generate --git https://github.com/CosmWasm/cw-template.git --branch 1.0-minimal --name PROJECT_NAME
+```
 
 **Older Version**
 
@@ -92,15 +98,3 @@ that have been published.
 Please replace this README file with information about your specific project. You can keep
 the `Developing.md` and `Publishing.md` files as useful referenced, but please set some
 proper description in the README.
-
-## Gitpod integration
-
-[Gitpod](https://www.gitpod.io/) container-based development platform will be enabled on your project by default.
-
-Workspace contains:
- - **rust**: for builds
- - [wasmd](https://github.com/CosmWasm/wasmd): for local node setup and client
- - **jq**: shell JSON manipulation tool
-
-Follow [Gitpod Getting Started](https://www.gitpod.io/docs/getting-started) and launch your workspace.
-
