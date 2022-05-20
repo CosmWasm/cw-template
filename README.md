@@ -57,6 +57,7 @@ Then run the following:
 ```sh
 # this is needed to create a valid Cargo.lock file (see below)
 cargo check
+git init
 git branch -M main
 git add .
 git commit -m 'Initial Commit'
