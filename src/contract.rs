@@ -4,7 +4,7 @@ use cosmwasm_std::{to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response,
 use cw2::set_contract_version;
 
 use crate::error::ContractError;
-use crate::msg::{CountResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
+use crate::msg::{ExecuteMsg, GetCountResponse, InstantiateMsg, QueryMsg};
 use crate::state::{State, STATE};
 
 // version info for migration info
@@ -71,9 +71,9 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     }
 }
 
-fn query_count(deps: Deps) -> StdResult<CountResponse> {
+fn query_count(deps: Deps) -> StdResult<GetCountResponse> {
     let state = STATE.load(deps.storage)?;
-    Ok(CountResponse { count: state.count })
+    Ok(GetCountResponse { count: state.count })
 }
 
 #[cfg(test)]
@@ -95,7 +95,7 @@ mod tests {
 
         // it worked, let's query the state
         let res = query(deps.as_ref(), mock_env(), QueryMsg::GetCount {}).unwrap();
-        let value: CountResponse = from_binary(&res).unwrap();
+        let value: GetCountResponse = from_binary(&res).unwrap();
         assert_eq!(17, value.count);
     }
 
@@ -114,7 +114,7 @@ mod tests {
 
         // should increase counter by 1
         let res = query(deps.as_ref(), mock_env(), QueryMsg::GetCount {}).unwrap();
-        let value: CountResponse = from_binary(&res).unwrap();
+        let value: GetCountResponse = from_binary(&res).unwrap();
         assert_eq!(18, value.count);
     }
 
@@ -142,7 +142,7 @@ mod tests {
 
         // should now be 5
         let res = query(deps.as_ref(), mock_env(), QueryMsg::GetCount {}).unwrap();
-        let value: CountResponse = from_binary(&res).unwrap();
+        let value: GetCountResponse = from_binary(&res).unwrap();
         assert_eq!(5, value.count);
     }
 }
