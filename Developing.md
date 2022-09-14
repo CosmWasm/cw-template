@@ -106,7 +106,7 @@ to run it is this:
 docker run --rm -v "$$(pwd)":/contract \
     --mount type=volume,source="$$(basename "$$(pwd)")_cache",target=/contract/target \
     --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
-    enigmampc/secret-contract-optimizer:1.0.3
+    ghcr.io/scrtlabs/localsecret:v1.4.0-beta.5
 ```
 
 We must mount the contract code to `/contract`. You can use an absolute path instead

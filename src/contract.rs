@@ -17,6 +17,8 @@ pub fn instantiate(
         owner: deps.api.addr_canonicalize(info.sender.as_str())?,
     };
 
+    deps.api
+        .debug(format!("Contract was initialized by {}", info.sender).as_str());
     config(deps.storage).save(&state)?;
 
     Ok(Response::default())
@@ -36,6 +38,7 @@ pub fn try_increment(deps: DepsMut, _env: Env) -> StdResult<Response> {
         Ok(state)
     })?;
 
+    deps.api.debug("count incremented successfully");
     Ok(Response::default())
 }
 
@@ -48,6 +51,8 @@ pub fn try_reset(deps: DepsMut, info: MessageInfo, count: i32) -> StdResult<Resp
         state.count = count;
         Ok(state)
     })?;
+
+    deps.api.debug("count reset successfully");
     Ok(Response::default())
 }
 

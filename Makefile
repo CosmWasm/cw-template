@@ -19,7 +19,7 @@ unit-test:
 .PHONY: build _build
 build: _build compress-wasm
 _build:
-	RUSTFLAGS='-C link-arg=-s' cargo build --release --target wasm32-unknown-unknown --features="debug-print"
+	RUSTFLAGS='-C link-arg=-s' cargo build --release --target wasm32-unknown-unknown
 
 # This is a build suitable for uploading to mainnet.
 # Calls to `debug_print` get removed by the compiler.
@@ -34,7 +34,7 @@ build-mainnet-reproducible:
 	docker run --rm -v "$$(pwd)":/contract \
 		--mount type=volume,source="$$(basename "$$(pwd)")_cache",target=/contract/target \
 		--mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
-		enigmampc/secret-contract-optimizer:1.0.3
+		ghcr.io/scrtlabs/localsecret:v1.4.0-beta.5
 
 .PHONY: compress-wasm
 compress-wasm:
@@ -51,9 +51,9 @@ schema:
 .PHONY: start-server
 start-server: # CTRL+C to stop
 	docker run -it --rm \
-		-p 26657:26657 -p 26656:26656 -p 1317:1317 -p 5000:5000 \
+		-p 9091:9091 -p 26657:26657 -p 26656:26656 -p 1317:1317 -p 5000:5000 \
 		-v $$(pwd):/root/code \
-		--name secretdev enigmampc/secret-network-sw-dev:v1.2.6
+		--name secretdev ghcr.io/scrtlabs/localsecret:v1.4.0-beta.5
 
 # This relies on running `start-server` in another console
 # You can run other commands on the secretcli inside the dev image

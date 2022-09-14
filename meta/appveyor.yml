@@ -10,7 +10,7 @@
 image: Ubuntu
 
 environment:
-  TOOLCHAIN: 1.43.1
+  TOOLCHAIN: 1.63.0
 
 cache:
   - $HOME/.rustup/ -> meta/appveyor.yml
@@ -41,7 +41,7 @@ build_script:
   - cargo unit-test
   - cargo wasm
   - cargo integration-test
-#  - cargo integration-test --no-default-features --features singlepass
+  #  - cargo integration-test --no-default-features --features singlepass
   - cargo schema
 
 # whitelist long living branches

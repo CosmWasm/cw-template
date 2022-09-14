@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        rust: [stable]
+        rust: [1.63.0]
         make:
           - name: Run integration tests # Integration tests
             task: "npx ts-node tests/integration.ts"
@@ -31,11 +31,12 @@ jobs:
       # Label used to access the service container
       secret:
         # Docker Hub image
-        image: enigmampc/secret-network-sw-dev:v1.2.2-1
+        image: ghcr.io/scrtlabs/localsecret:v1.4.0-beta.5
         ports:
           # Opens tcp port
           - 5000:5000
           - 9091:9091
+          - 1317:1317
 
     steps:
       - uses: actions/checkout@v2
