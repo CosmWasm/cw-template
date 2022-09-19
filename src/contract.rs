@@ -39,41 +39,49 @@ pub fn execute(
     msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
     match msg {
-        ExecuteMsg::Increment {} => try_increment(deps),
-        ExecuteMsg::Reset { count } => try_reset(deps, info, count),
+        ExecuteMsg::Increment {} => execute::increment(deps),
+        ExecuteMsg::Reset { count } => execute::reset(deps, info, count),
     }
 }
 
-pub fn try_increment(deps: DepsMut) -> Result<Response, ContractError> {
-    STATE.update(deps.storage, |mut state| -> Result<_, ContractError> {
-        state.count += 1;
-        Ok(state)
-    })?;
+pub mod execute {
+    use super::*;
 
-    Ok(Response::new().add_attribute("method", "try_increment"))
-}
+    pub fn increment(deps: DepsMut) -> Result<Response, ContractError> {
+        STATE.update(deps.storage, |mut state| -> Result<_, ContractError> {
+            state.count += 1;
+            Ok(state)
+        })?;
 
-pub fn try_reset(deps: DepsMut, info: MessageInfo, count: i32) -> Result<Response, ContractError> {
-    STATE.update(deps.storage, |mut state| -> Result<_, ContractError> {
-        if info.sender != state.owner {
-            return Err(ContractError::Unauthorized {});
-        }
-        state.count = count;
-        Ok(state)
-    })?;
-    Ok(Response::new().add_attribute("method", "reset"))
+        Ok(Response::new().add_attribute("action", "increment"))
+    }
+
+    pub fn reset(deps: DepsMut, info: MessageInfo, count: i32) -> Result<Response, ContractError> {
+        STATE.update(deps.storage, |mut state| -> Result<_, ContractError> {
+            if info.sender != state.owner {
+                return Err(ContractError::Unauthorized {});
+            }
+            state.count = count;
+            Ok(state)
+        })?;
+        Ok(Response::new().add_attribute("action", "reset"))
+    }
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::GetCount {} => to_binary(&query_count(deps)?),
+        QueryMsg::GetCount {} => to_binary(&query::count(deps)?),
     }
 }
 
-fn query_count(deps: Deps) -> StdResult<GetCountResponse> {
-    let state = STATE.load(deps.storage)?;
-    Ok(GetCountResponse { count: state.count })
+pub mod query {
+    use super::*;
+
+    pub fn count(deps: Deps) -> StdResult<GetCountResponse> {
+        let state = STATE.load(deps.storage)?;
+        Ok(GetCountResponse { count: state.count })
+    }
 }
 
 #[cfg(test)]
