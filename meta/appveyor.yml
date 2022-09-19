@@ -13,8 +13,8 @@ environment:
   TOOLCHAIN: 1.62.0
   CARGO_GENERATE_VERSION: 0.16.0
 
-services:
-  - docker
+# services:
+#   - docker
 
 cache:
   - $HOME/.rustup/ -> meta/appveyor.yml
@@ -45,9 +45,9 @@ build_script:
   - cargo unit-test
   - cargo wasm
   - cargo schema
-  - docker build --pull -t "cosmwasm/cw-gitpod-base:${APPVEYOR_REPO_COMMIT}" .
-  - \[ "${APPVEYOR_REPO_BRANCH}" = "main" \] && image_tag=latest || image_tag=${APPVEYOR_REPO_TAG_NAME}
-  - docker tag "cosmwasm/cw-gitpod-base:${APPVEYOR_REPO_COMMIT}" "cosmwasm/cw-gitpod-base:${image_tag}"
+#   - docker build --pull -t "cosmwasm/cw-gitpod-base:${APPVEYOR_REPO_COMMIT}" .
+#   - \[ "${APPVEYOR_REPO_BRANCH}" = "main" \] && image_tag=latest || image_tag=${APPVEYOR_REPO_TAG_NAME}
+#   - docker tag "cosmwasm/cw-gitpod-base:${APPVEYOR_REPO_COMMIT}" "cosmwasm/cw-gitpod-base:${image_tag}"
 
 # Publish cosmwasm/cw-gitpod-base
 #
