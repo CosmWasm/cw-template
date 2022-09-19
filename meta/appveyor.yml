@@ -10,7 +10,7 @@
 image: Ubuntu
 
 environment:
-  TOOLCHAIN: 1.58.1
+  TOOLCHAIN: 1.60.0
 
 services:
   - docker
