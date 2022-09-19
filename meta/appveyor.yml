@@ -30,7 +30,8 @@ install:
   - rustc --version
   - cargo --version
   - rustup target add wasm32-unknown-unknown
-  - cargo install --features vendored-openssl cargo-generate --version "$CARGO_GENERATE_VERSION" --debug
+  # Use || true because this fails when already installed from cache
+  - cargo install --features vendored-openssl cargo-generate --version "$CARGO_GENERATE_VERSION" --debug || true
 
 build_script:
   # No matter what is currently checked out by the CI (main, other branch, PR merge commit),
