@@ -10,7 +10,8 @@
 image: Ubuntu
 
 environment:
-  TOOLCHAIN: 1.60.0
+  TOOLCHAIN: 1.61.0
+  CARGO_GENERATE_VERSION: 0.16.0
 
 services:
   - docker
@@ -29,7 +30,7 @@ install:
   - rustc --version
   - cargo --version
   - rustup target add wasm32-unknown-unknown
-  - cargo install --features vendored-openssl cargo-generate || true
+  - cargo install --features vendored-openssl "cargo-generate@$CARGO_GENERATE_VERSION" || true
 
 build_script:
   # No matter what is currently checked out by the CI (main, other branch, PR merge commit),
