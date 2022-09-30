@@ -7,9 +7,11 @@ use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, GetCountResponse, InstantiateMsg, QueryMsg};
 use crate::state::{State, STATE};
 
-// version info for migration info
+{% if minimal %}/*
+{% endif %}// version info for migration info
 const CONTRACT_NAME: &str = "crates.io:{{project-name}}";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
+{% if minimal %}*/{% endif %}
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
@@ -18,7 +20,7 @@ pub fn instantiate(
     info: MessageInfo,
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
-    let state = State {
+    {% if minimal %}unimplemented!(){% else %}let state = State {
         count: msg.count,
         owner: info.sender.clone(),
     };
@@ -28,7 +30,7 @@ pub fn instantiate(
     Ok(Response::new()
         .add_attribute("method", "instantiate")
         .add_attribute("owner", info.sender)
-        .add_attribute("count", msg.count.to_string()))
+        .add_attribute("count", msg.count.to_string())){% endif %}
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
