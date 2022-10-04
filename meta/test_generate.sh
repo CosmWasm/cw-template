@@ -11,10 +11,8 @@ PROJECT_NAME="testgen-local"
   echo "Navigating to $TMP_DIR"
   cd "$TMP_DIR"
 
-  GIT_BRANCH=$(git -C "$REPO_ROOT" branch --show-current)
-
-  echo "Generating project from local repository (branch $GIT_BRANCH) ..."
-  cargo generate --git "$REPO_ROOT" --name "$PROJECT_NAME" --branch "$GIT_BRANCH"
+  echo "Generating project from local repository ..."
+  cargo generate --path "$REPO_ROOT" --name "$PROJECT_NAME"
 
   (
     cd "$PROJECT_NAME"

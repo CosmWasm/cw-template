@@ -1,4 +1,4 @@
-use schemars::JsonSchema;
+{% unless minimal %}use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use cosmwasm_std::Addr;
@@ -10,4 +10,4 @@ pub struct State {
     pub owner: Addr,
 }
 
-pub const STATE: Item<State> = Item::new("state");
+pub const STATE: Item<State> = Item::new("state");{% endunless %}

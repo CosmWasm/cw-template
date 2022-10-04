@@ -3,3 +3,20 @@
 # This is needed when files contains curly brackets as in `v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}`.
 # The files will be copied 1:1 to the target project. To avoid shipping them completely add them to `.genignore`.
 exclude = [".circleci/config.yml"]
+
+[placeholders.minimal]
+type = "bool"
+prompt = """Would you like to generate the minimal template?
+The full template includes some example logic in case you're new to CosmWasm smart contracts.
+The minimal template assumes you already know how to write your own logic, and doesn't get in your way."""
+default = false
+
+[conditional.'minimal']
+ignore = [
+    "Developing.md",
+    "Importing.md",
+    "Publishing.md",
+    ".gitpod.yml",
+    ".gitpod.Dockerfile",
+    "src/integration_tests.rs",
+]
