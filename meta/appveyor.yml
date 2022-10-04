@@ -39,7 +39,19 @@ build_script:
   # cargo generate.
   - git branch current-ci-checkout
   - cd ..
-  - cargo generate --git cw-template --name testgen-ci --branch current-ci-checkout
+  # Generate minimal
+  - cargo generate --git cw-template --name testgen-ci --branch current-ci-checkout -d minimal=true
+  - cd testgen-ci
+  - ls -lA
+  - cargo fmt -- --check
+  - cargo unit-test
+  - cargo wasm
+  - cargo schema
+  # Cleanup
+  - cd ..
+  - rm -r testgen-ci
+  # Generate full
+  - cargo generate --git cw-template --name testgen-ci --branch current-ci-checkout -d minimal=false
   - cd testgen-ci
   - ls -lA
   - cargo fmt -- --check
