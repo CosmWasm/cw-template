@@ -34,7 +34,7 @@ cargo generate --git https://github.com/CosmWasm/cw-template.git --name PROJECT_
 For cloning minimal code repo:
 
 ```sh
-cargo generate --git https://github.com/CosmWasm/cw-template.git --branch 1.0-minimal --name PROJECT_NAME
+cargo generate --git https://github.com/CosmWasm/cw-template.git --name PROJECT_NAME -d minimal=true
 ```
 
 **Older Version**
