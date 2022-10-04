@@ -1,11 +1,11 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use cosmwasm_std::{
+{% if minimal %}use cosmwasm_std::{to_binary, Addr, CosmosMsg, StdResult, WasmMsg};{% else %}use cosmwasm_std::{
     to_binary, Addr, CosmosMsg, CustomQuery, Querier, QuerierWrapper, StdResult, WasmMsg, WasmQuery,
-};
+};{% endif %}
 
-use crate::msg::{ExecuteMsg, GetCountResponse, QueryMsg};
+{% if minimal %}use crate::msg::ExecuteMsg;{% else %}use crate::msg::{ExecuteMsg, GetCountResponse, QueryMsg};{% endif %}
 
 /// CwTemplateContract is a wrapper around Addr that provides a lot of helpers
 /// for working with this.
@@ -25,7 +25,7 @@ impl CwTemplateContract {
             funds: vec![],
         }
         .into())
-    }
+    }{% unless minimal %}
 
     /// Get Count
     pub fn count<Q, T, CQ>(&self, querier: &Q) -> StdResult<GetCountResponse>
@@ -42,5 +42,5 @@ impl CwTemplateContract {
         .into();
         let res: GetCountResponse = QuerierWrapper::<CQ>::new(querier).query(&query)?;
         Ok(res)
-    }
+    }{% endunless %}
 }
