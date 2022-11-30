@@ -6,9 +6,10 @@ exclude = [".circleci/config.yml"]
 
 [placeholders.minimal]
 type = "bool"
-prompt = """Would you like to generate the minimal template?
-The full template includes some example logic in case you're new to CosmWasm smart contracts.
-The minimal template assumes you already know how to write your own logic, and doesn't get in your way."""
+prompt = """The full template includes some example logic in case you're new to CosmWasm smart contracts.
+The minimal template assumes you already know how to write your own logic, and doesn't get in your way.
+
+Would you like to generate the minimal template?"""
 default = false
 
 [conditional.'minimal']
