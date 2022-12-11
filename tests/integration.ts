@@ -7,9 +7,9 @@ import assert from "assert";
 const initializeClient = async (endpoint: string, chainId: string) => {
   const wallet = new Wallet(); // Use default constructor of wallet to generate random mnemonic.
   const accAddress = wallet.address;
-  const client = await SecretNetworkClient.create({
+  const client = new SecretNetworkClient({
     // Create a client to interact with the network
-    grpcWebUrl: endpoint,
+    url: endpoint,
     chainId: chainId,
     wallet: wallet,
     walletAddress: accAddress,
@@ -29,7 +29,7 @@ const initializeContract = async (
 
   const uploadReceipt = await client.tx.compute.storeCode(
     {
-      wasmByteCode: wasmCode,
+      wasm_byte_code: wasmCode,
       sender: client.address,
       source: "",
       builder: "",
@@ -55,15 +55,20 @@ const initializeContract = async (
   const codeId = Number(codeIdKv!.value);
   console.log("Contract codeId: ", codeId);
 
-  const contractCodeHash = await client.query.compute.codeHash(codeId);
+  const contractCodeHash = (await client.query.compute.codeHashByCodeId({code_id: String(codeId)})).code_hash;
+
+  if (contractCodeHash === undefined) {
+    throw new Error(`Failed to get code hash`);
+  }
+
   console.log(`Contract hash: ${contractCodeHash}`);
 
   const contract = await client.tx.compute.instantiateContract(
     {
       sender: client.address,
-      codeId,
-      initMsg: { count: 4 }, // Initialize our counter to start from 4. This message will trigger our Init function
-      codeHash: contractCodeHash,
+      code_id: codeId,
+      init_msg: { count: 4 }, // Initialize our counter to start from 4. This message will trigger our Init function
+      code_hash: contractCodeHash,
       label: "My contract" + Math.ceil(Math.random() * 10000), // The label should be unique for every contract, add random string in order to maintain uniqueness
     },
     {
@@ -83,7 +88,7 @@ const initializeContract = async (
 
   console.log(`Contract address: ${contractAddress}`);
 
-  var contractInfo: [string, string] = [contractCodeHash, contractAddress];
+  const contractInfo: [string, string] = [contractCodeHash, contractAddress];
   return contractInfo;
 };
 
@@ -96,7 +101,12 @@ async function getScrtBalance(userCli: SecretNetworkClient): Promise<string> {
     address: userCli.address,
     denom: "uscrt",
   });
-  return balanceResponse.balance!.amount;
+
+  if (balanceResponse?.balance?.amount === undefined) {
+    throw new Error(`Failed to get balance for address: ${userCli.address}`)
+  }
+
+  return balanceResponse.balance.amount;
 }
 
 async function fillUpFromFaucet(
@@ -145,8 +155,8 @@ async function queryCount(
   type CountResponse = { count: number };
 
   const countResponse = (await client.query.compute.queryContract({
-    contractAddress: contractAddress,
-    codeHash: contractHash,
+    contract_address: contractAddress,
+    code_hash: contractHash,
     query: { get_count: {} },
   })) as CountResponse;
 
@@ -167,12 +177,12 @@ async function incrementTx(
   const tx = await client.tx.compute.executeContract(
     {
       sender: client.address,
-      contractAddress: contractAddess,
-      codeHash: contractHash,
+      contract_address: contractAddess,
+      code_hash: contractHash,
       msg: {
         increment: {},
       },
-      sentFunds: [],
+      sent_funds: [],
     },
     {
       gasLimit: 200000,
@@ -191,12 +201,12 @@ async function resetTx(
   const tx = await client.tx.compute.executeContract(
     {
       sender: client.address,
-      contractAddress: contractAddess,
-      codeHash: contractHash,
+      contract_address: contractAddess,
+      code_hash: contractHash,
       msg: {
         reser: { count: 0 },
       },
-      sentFunds: [],
+      sent_funds: [],
     },
     {
       gasLimit: 200000,

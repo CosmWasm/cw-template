@@ -34,7 +34,7 @@ build-mainnet-reproducible:
 	docker run --rm -v "$$(pwd)":/contract \
 		--mount type=volume,source="$$(basename "$$(pwd)")_cache",target=/contract/target \
 		--mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
-		ghcr.io/scrtlabs/localsecret:v1.4.0-beta.5
+		ghcr.io/scrtlabs/localsecret:v1.6.0-rc.3
 
 .PHONY: compress-wasm
 compress-wasm:
@@ -53,7 +53,7 @@ start-server: # CTRL+C to stop
 	docker run -it --rm \
 		-p 9091:9091 -p 26657:26657 -p 26656:26656 -p 1317:1317 -p 5000:5000 \
 		-v $$(pwd):/root/code \
-		--name secretdev ghcr.io/scrtlabs/localsecret:v1.4.0-beta.5
+		--name secretdev ghcr.io/scrtlabs/localsecret:v1.6.0-rc.3
 
 # This relies on running `start-server` in another console
 # You can run other commands on the secretcli inside the dev image

@@ -33,12 +33,14 @@ default = []
 backtraces = ["cosmwasm-std/backtraces"]
 
 [dependencies]
-snafu = { version = "0.6.3" }
-serde = { version = "1.0.114", default-features = false, features = ["derive"] }
-schemars = "0.8.1"
-cosmwasm-std = { git = "https://github.com/scrtlabs/cosmwasm", branch = "secret" }
-cosmwasm-storage = { git = "https://github.com/scrtlabs/cosmwasm", branch = "secret" }
-# secret-toolkit = "0.2.0" # Uncomment this for extra tools
+serde = { version = "1.0.147", default-features = false, features = ["derive"] }
+schemars = "0.8.11"
+cosmwasm-std = { package = "secret-cosmwasm-std", version = "1.0" }
+cosmwasm-storage = { package = "secret-cosmwasm-storage", version = "1.0" }
+
+# Uncomment these for some common extra tools
+# secret-toolkit = "0.7.0"
+# cw-storage-plus = { version = "0.14.0", default-features = false }
 
 [dev-dependencies]
 cosmwasm-schema = { version = "1.1.0" }

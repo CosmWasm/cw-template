@@ -31,7 +31,7 @@ jobs:
       # Label used to access the service container
       secret:
         # Docker Hub image
-        image: ghcr.io/scrtlabs/localsecret:v1.4.0-beta.5
+        image: ghcr.io/scrtlabs/localsecret:v1.6.0-rc.3
         ports:
           # Opens tcp port
           - 5000:5000
@@ -39,7 +39,7 @@ jobs:
           - 1317:1317
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install sccache
         env:
           LINK: https://github.com/mozilla/sccache/releases/download
@@ -61,7 +61,7 @@ jobs:
           rustup target add wasm32-unknown-unknown
 
       - name: Cache cargo registry
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         continue-on-error: false
         with:
           path: |
