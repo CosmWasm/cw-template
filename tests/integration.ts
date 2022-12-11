@@ -127,7 +127,7 @@ async function fillUpFromFaucet(
 
 // Initialization procedure
 async function initializeAndUploadContract() {
-  let endpoint = "http://localhost:9091";
+  let endpoint = "http://localhost:1317";
   let chainId = "secretdev-1";
 
   const client = await initializeClient(endpoint, chainId);

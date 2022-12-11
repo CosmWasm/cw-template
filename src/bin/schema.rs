@@ -8,7 +8,7 @@ use secret_contract_example::state::State;
 
 fn main() {
     let mut out_dir = current_dir().unwrap();
-    out_dir.push("schema");
+    out_dir.push("../../schema");
     create_dir_all(&out_dir).unwrap();
     remove_schemas(&out_dir).unwrap();
 
