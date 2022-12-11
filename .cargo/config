@@ -1,3 +1,7 @@
 [alias]
-unit-test = "test --lib --features backtraces"
-schema = "run --example schema"
+# Temporarily removed the backtraces feature from the unit-test run due to compilation errors in
+# the cosmwasm-std package:
+# cosmwasm-std = { git = "https://github.com/scrtlabs/cosmwasm", branch = "secret" }
+# unit-test = "test --lib --features backtraces"
+unit-test = "test --lib"
+schema = "run --bin schema --features schema"
