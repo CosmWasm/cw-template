@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Wallet, SecretNetworkClient, fromUtf8 } from "secretjs";
+import { Wallet, SecretNetworkClient } from "secretjs";
 import fs from "fs";
 import assert from "assert";
 
