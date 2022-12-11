@@ -24,7 +24,7 @@ Now, use it to create your new contract.
 Go to the folder in which you want to place it and run:
 
 ```sh
-cargo generate --git https://github.com/enigmampc/secret-template.git --name YOUR_NAME_HERE
+cargo generate --git https://github.com/scrtlabs/secret-template.git --name YOUR_NAME_HERE
 ```
 
 You will now have a new folder called `YOUR_NAME_HERE` (I hope you changed that to something else)
