@@ -9,7 +9,7 @@ This assumes you understand the theory and just want to get coding.
 
 ## Creating a new repo from template
 
-Assuming you have a recent version of rust and cargo (v1.58.1+) installed
+Assuming you have a recent version of Rust and Cargo installed
 (via [rustup](https://rustup.rs/)),
 then the following should get you a new repo to start a contract:
 
@@ -24,12 +24,11 @@ cargo install cargo-run-script
 Now, use it to create your new contract.
 Go to the folder in which you want to place it and run:
 
-
 **Latest**
 
 ```sh
 cargo generate --git https://github.com/CosmWasm/cw-template.git --name PROJECT_NAME
-````
+```
 
 For cloning minimal code repo:
 
@@ -43,7 +42,7 @@ Pass version as branch flag:
 
 ```sh
 cargo generate --git https://github.com/CosmWasm/cw-template.git --branch <version> --name PROJECT_NAME
-````
+```
 
 Example:
 
