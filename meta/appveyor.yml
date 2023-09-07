@@ -11,7 +11,7 @@ image: Ubuntu
 
 environment:
   TOOLCHAIN: 1.69.0
-  CARGO_GENERATE_VERSION: 0.16.0
+  CARGO_GENERATE_VERSION: 0.18.4
 
 # services:
 #   - docker
