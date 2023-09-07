@@ -36,20 +36,6 @@ For cloning minimal code repo:
 cargo generate --git https://github.com/CosmWasm/cw-template.git --name PROJECT_NAME -d minimal=true
 ```
 
-**Older Version**
-
-Pass version as branch flag:
-
-```sh
-cargo generate --git https://github.com/CosmWasm/cw-template.git --branch <version> --name PROJECT_NAME
-```
-
-Example:
-
-```sh
-cargo generate --git https://github.com/CosmWasm/cw-template.git --branch 1.0 --name PROJECT_NAME
-```
-
 You will now have a new folder called `PROJECT_NAME` (I hope you changed that to something else)
 containing a simple working contract and build system that you can customize.
 
