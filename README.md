@@ -47,7 +47,7 @@ cargo generate --git https://github.com/CosmWasm/cw-template.git --branch <versi
 Example:
 
 ```sh
-cargo generate --git https://github.com/CosmWasm/cw-template.git --branch 0.16 --name PROJECT_NAME
+cargo generate --git https://github.com/CosmWasm/cw-template.git --branch 1.0 --name PROJECT_NAME
 ```
 
 You will now have a new folder called `PROJECT_NAME` (I hope you changed that to something else)
