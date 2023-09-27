@@ -86,7 +86,7 @@ docker run --rm -v "$(pwd)":/code \
   cosmwasm/rust-optimizer-arm64:0.14.0
 ```
 
-We must mount the contract code to `/code`. You can use a absolute path instead
+We must mount the contract code to `/code`. You can use an absolute path instead
 of `$(pwd)` if you don't want to `cd` to the directory first. The other two
 volumes are nice for speedup.
 Note the `/target` cache is unique for each contract being compiled to limit
