@@ -1,8 +1,9 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-{% if minimal %}use cosmwasm_std::{to_binary, Addr, CosmosMsg, StdResult, WasmMsg};{% else %}use cosmwasm_std::{
-    to_binary, Addr, CosmosMsg, CustomQuery, Querier, QuerierWrapper, StdResult, WasmMsg, WasmQuery,
+{% if minimal %}use cosmwasm_std::{to_json_binary, Addr, CosmosMsg, StdResult, WasmMsg};{% else %}use cosmwasm_std::{
+    to_json_binary, Addr, CosmosMsg, CustomQuery, Querier, QuerierWrapper, StdResult, WasmMsg,
+    WasmQuery,
 };{% endif %}
 
 {% if minimal %}use crate::msg::ExecuteMsg;{% else %}use crate::msg::{ExecuteMsg, GetCountResponse, QueryMsg};{% endif %}
@@ -18,7 +19,7 @@ impl CwTemplateContract {
     }
 
     pub fn call<T: Into<ExecuteMsg>>(&self, msg: T) -> StdResult<CosmosMsg> {
-        let msg = to_binary(&msg.into())?;
+        let msg = to_json_binary(&msg.into())?;
         Ok(WasmMsg::Execute {
             contract_addr: self.addr().into(),
             msg,
@@ -37,7 +38,7 @@ impl CwTemplateContract {
         let msg = QueryMsg::GetCount {};
         let query = WasmQuery::Smart {
             contract_addr: self.addr().into(),
-            msg: to_binary(&msg)?,
+            msg: to_json_binary(&msg)?,
         }
         .into();
         let res: GetCountResponse = QuerierWrapper::<CQ>::new(querier).query(&query)?;
