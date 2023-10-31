@@ -1,6 +1,6 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{% raw %}{{% endraw %}{% unless minimal %}to_binary, {% endunless %}Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
+use cosmwasm_std::{% raw %}{{% endraw %}{% unless minimal %}to_json_binary, {% endunless %}Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
 {% if minimal %}// {% endif %}use cw2::set_contract_version;
 
 use crate::error::ContractError;
@@ -73,7 +73,7 @@ pub mod execute {
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query({% if minimal %}_{% endif %}deps: Deps, _env: Env, {% if minimal %}_{% endif %}msg: QueryMsg) -> StdResult<Binary> {
     {% if minimal %}unimplemented!(){% else %}match msg {
-        QueryMsg::GetCount {} => to_binary(&query::count(deps)?),
+        QueryMsg::GetCount {} => to_json_binary(&query::count(deps)?),
     }{% endif %}
 }{% unless minimal %}
 
@@ -90,7 +90,7 @@ pub mod query {
 mod tests {% raw %}{{% endraw %}{% unless minimal %}
     use super::*;
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
-    use cosmwasm_std::{coins, from_binary};
+    use cosmwasm_std::{coins, from_json};
 
     #[test]
     fn proper_initialization() {
@@ -105,7 +105,7 @@ mod tests {% raw %}{{% endraw %}{% unless minimal %}
 
         // it worked, let's query the state
         let res = query(deps.as_ref(), mock_env(), QueryMsg::GetCount {}).unwrap();
-        let value: GetCountResponse = from_binary(&res).unwrap();
+        let value: GetCountResponse = from_json(&res).unwrap();
         assert_eq!(17, value.count);
     }
 
@@ -124,7 +124,7 @@ mod tests {% raw %}{{% endraw %}{% unless minimal %}
 
         // should increase counter by 1
         let res = query(deps.as_ref(), mock_env(), QueryMsg::GetCount {}).unwrap();
-        let value: GetCountResponse = from_binary(&res).unwrap();
+        let value: GetCountResponse = from_json(&res).unwrap();
         assert_eq!(18, value.count);
     }
 
@@ -152,7 +152,7 @@ mod tests {% raw %}{{% endraw %}{% unless minimal %}
 
         // should now be 5
         let res = query(deps.as_ref(), mock_env(), QueryMsg::GetCount {}).unwrap();
-        let value: GetCountResponse = from_binary(&res).unwrap();
+        let value: GetCountResponse = from_json(&res).unwrap();
         assert_eq!(5, value.count);
     }
 {% endunless %}}
