@@ -21,7 +21,7 @@ impl<Chain: CwEnv> Uploadable for ContractInterface<Chain> {
         ))
     }
 }
-
+{% unless minimal %}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -43,3 +43,4 @@ mod tests {
         Ok(())
     }
 }
+{% endunless %}
