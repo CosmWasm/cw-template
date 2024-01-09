@@ -75,6 +75,8 @@ more on how to run tests and develop code. Or go through the
 [online tutorial](https://docs.cosmwasm.com/) to get a better feel
 of how to develop.
 
+This template includes [cw-orchestrator](https://docs.rs/cw-orch/latest/cw_orch/) by default. This library allows you to unit-test, integration-test as well as interact with your contracts on-chain using a common intuitive syntax that leverages rust type-safety to assist you throughout your development process. You can find the interface definitions in the [src/interface.rs](src/interface.rs) file. You can also find more information in the [`cw-orch` documentation](https://orchestrator.abstract.money/).
+
 [Publishing](./Publishing.md) contains useful information on how to publish your contract
 to the world, once you are ready to deploy it on a running blockchain. And
 [Importing](./Importing.md) contains information about pulling in other contracts or crates
