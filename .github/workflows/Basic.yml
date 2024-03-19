@@ -9,67 +9,45 @@ jobs:
   test:
     name: Test Suite
     runs-on: ubuntu-latest
+    env:
+      RUST_VERSION: stable
+      RUST_TARGET: wasm32-unknown-unknown
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
-
-      - name: Install stable toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: 1.60.0
-          target: wasm32-unknown-unknown
-          override: true
-
+        uses: actions/checkout@v4
+      - name: Install ${{ env.RUST_VERSION }} toolchain
+        run: |
+          rustup install --no-self-update ${{ env.RUST_VERSION }}
+          rustup default ${{ env.RUST_VERSION }}
+          rustup component add clippy rustfmt rust-src
+          rustup target add ${{ env.RUST_TARGET }}
       - name: Run unit tests
-        uses: actions-rs/cargo@v1
-        with:
-          command: unit-test
-          args: --locked
         env:
           RUST_BACKTRACE: 1
-
+        run: cargo test --locked
       - name: Compile WASM contract
-        uses: actions-rs/cargo@v1
-        with:
-          command: wasm
-          args: --locked
         env:
           RUSTFLAGS: "-C link-arg=-s"
+        run: cargo wasm --locked
 
   lints:
     name: Lints
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
-
-      - name: Install stable toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: 1.60.0
-          override: true
-          components: rustfmt, clippy
-
+        uses: actions/checkout@v4
+      - name: Install ${{ env.RUST_VERSION }} toolchain
+        run: |
+          rustup install --no-self-update ${{ env.RUST_VERSION }}
+          rustup default ${{ env.RUST_VERSION }}
+          rustup component add clippy rustfmt
+          rustup target add ${{ env.RUST_TARGET }}
       - name: Run cargo fmt
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
-
+        run: cargo fmt --all -- --check
       - name: Run cargo clippy
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: -- -D warnings
-
+        run: cargo clippy --all -- -D warnings
       - name: Generate Schema
-        uses: actions-rs/cargo@v1
-        with:
-          command: schema
-          args: --locked
-
+        run: cargo schema --locked
       - name: Schema Changes
         # fails if any changes not committed
         run: git diff --exit-code schema
