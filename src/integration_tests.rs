@@ -2,6 +2,7 @@
 mod tests {
     use crate::helpers::CwTemplateContract;
     use crate::msg::InstantiateMsg;
+    use cosmwasm_std::testing::MockApi;
     use cosmwasm_std::{Addr, Coin, Empty, Uint128};
     use cw_multi_test::{App, AppBuilder, Contract, ContractWrapper, Executor};
 
@@ -24,7 +25,7 @@ mod tests {
                 .bank
                 .init_balance(
                     storage,
-                    &Addr::unchecked(USER),
+                    &MockApi::default().addr_make(USER),
                     vec![Coin {
                         denom: NATIVE_DENOM.to_string(),
                         amount: Uint128::new(1),
@@ -37,6 +38,12 @@ mod tests {
     fn proper_instantiate() -> (App, CwTemplateContract) {
         let mut app = mock_app();
         let cw_template_id = app.store_code(contract_template());
+
+        let user = app.api().addr_make(USER);
+        assert_eq!(
+            app.wrap().query_balance(user, NATIVE_DENOM).unwrap().amount,
+            Uint128::new(1)
+        );
 
         let msg = InstantiateMsg { count: 1i32 };
         let cw_template_contract_addr = app
