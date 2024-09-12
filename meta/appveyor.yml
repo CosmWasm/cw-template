@@ -10,7 +10,7 @@
 image: Ubuntu
 
 environment:
-  TOOLCHAIN: 1.74.0
+  TOOLCHAIN: 1.75.0
   CARGO_GENERATE_VERSION: 0.18.3
 
 # services:
