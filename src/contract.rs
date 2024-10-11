@@ -89,7 +89,7 @@ pub mod query {
 #[cfg(test)]
 mod tests {% raw %}{{% endraw %}{% unless minimal %}
     use super::*;
-    use cosmwasm_std::testing::{mock_dependencies, mock_env, message_info};
+    use cosmwasm_std::testing::{message_info, mock_dependencies, mock_env};
     use cosmwasm_std::{coins, from_json};
 
     #[test]

@@ -1,10 +1,11 @@
 use {{project-name | snake_case}}::{
+    interface::ContractInterface,
     msg::{GetCountResponse, InstantiateMsg, QueryMsg},
-    ContractError, interface::ContractInterface,
+    ContractError,
 };
 // Use prelude to get all the necessary imports
-use cw_orch::prelude::*;
 use cw_orch::anyhow;
+use cw_orch::prelude::*;
 
 use cosmwasm_std::Addr;
 
