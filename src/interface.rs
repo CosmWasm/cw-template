@@ -7,13 +7,13 @@ pub struct ContractInterface;
 
 impl<Chain: CwEnv> Uploadable for ContractInterface<Chain> {
     /// Return the path to the wasm file corresponding to the contract
-    fn wasm(&self) -> WasmPath {
+    fn wasm(info: &ChainInfoOwned) -> WasmPath {
         artifacts_dir_from_workspace!()
             .find_wasm_path("{{crate_name}}")
             .unwrap()
     }
     /// Returns a CosmWasm contract wrapper
-    fn wrapper(&self) -> Box<dyn MockContract<Empty>> {
+    fn wrapper() -> Box<dyn MockContract<Empty>> {
         Box::new(ContractWrapper::new_with_empty(
             crate::contract::execute,
             crate::contract::instantiate,
@@ -34,7 +34,7 @@ mod tests {
         let contract = ContractInterface::new("project-name", mock);
         contract.upload()?;
 
-        contract.instantiate(&InstantiateMsg { count: 7 }, None, None)?;
+        contract.instantiate(&InstantiateMsg { count: 7 }, None, &[])?;
         assert_eq!(contract.get_count()?.count, 7);
 
         contract.increment()?;
