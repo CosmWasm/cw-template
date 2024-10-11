@@ -2,12 +2,12 @@ use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 use cosmwasm_std::Empty;
 use cw_orch::{interface, prelude::*};
 
-#[interface(InstantiateMsg, ExecuteMsg, QueryMsg, Empty)]
+#[interface(InstantiateMsg, ExecuteMsg, QueryMsg, Empty, id = "{{project-name}}")]
 pub struct ContractInterface;
 
 impl<Chain: CwEnv> Uploadable for ContractInterface<Chain> {
     /// Return the path to the wasm file corresponding to the contract
-    fn wasm(info: &ChainInfoOwned) -> WasmPath {
+    fn wasm(_info: &ChainInfoOwned) -> WasmPath {
         artifacts_dir_from_workspace!()
             .find_wasm_path("{{crate_name}}")
             .unwrap()
@@ -31,7 +31,7 @@ mod tests {
     #[test]
     fn contract_logic() -> anyhow::Result<()> {
         let mock = Mock::new(&Addr::unchecked("sender"));
-        let contract = ContractInterface::new("project-name", mock);
+        let contract = ContractInterface::new(mock);
         contract.upload()?;
 
         contract.instantiate(&InstantiateMsg { count: 7 }, None, &[])?;
