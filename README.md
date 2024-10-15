@@ -27,13 +27,13 @@ Go to the folder in which you want to place it and run:
 **Latest**
 
 ```sh
-cargo generate --git https://github.com/CosmWasm/cw-template.git --name PROJECT_NAME
+cargo generate --git https://github.com/AbstractSDK/cw-template.git --name PROJECT_NAME
 ```
 
 For cloning minimal code repo:
 
 ```sh
-cargo generate --git https://github.com/CosmWasm/cw-template.git --name PROJECT_NAME -d minimal=true
+cargo generate --git https://github.com/AbstractSDK/cw-template.git --name PROJECT_NAME -d minimal=true
 ```
 
 You will now have a new folder called `PROJECT_NAME` (I hope you changed that to something else)
