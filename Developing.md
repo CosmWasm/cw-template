@@ -71,6 +71,13 @@ produce an extremely small build output in a consistent manner. The suggest way
 to run it is this:
 
 ```sh
+chmod +x ./optimize.sh
+./optimize.sh
+```
+
+Which is equivalent to:
+
+```sh
 docker run --rm -v "$(pwd)":/code \
   --mount type=volume,source="$(basename "$(pwd)")_cache",target=/target \
   --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \

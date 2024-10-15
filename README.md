@@ -18,7 +18,6 @@ Unless you did that before, run this line now:
 
 ```sh
 cargo install cargo-generate --features vendored-openssl
-cargo install cargo-run-script
 ```
 
 Now, use it to create your new contract.
