@@ -6,5 +6,5 @@ pub mod state;
 
 pub use crate::error::ContractError;
 
-#[cfg(feature = "interface")]
+#[cfg(not(target_arch = "wasm32"))]
 pub mod interface;

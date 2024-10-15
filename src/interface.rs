@@ -1,6 +1,7 @@
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 use cosmwasm_std::Empty;
-use cw_orch::{interface, prelude::*};
+use cw_orch::interface;
+use cw_orch::prelude::*;
 
 #[interface(InstantiateMsg, ExecuteMsg, QueryMsg, Empty, id = "{{project-name}}")]
 pub struct ContractInterface;
