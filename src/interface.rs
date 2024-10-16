@@ -33,7 +33,7 @@ impl<Chain: CwEnv> {{project-name | upper_camel_case}}I<Chain> {
         contract.upload()?;
 
         // Instantiate the contract
-        let msg = InstantiateMsg { count: 1i32 };
+        let msg = InstantiateMsg {% raw %}{{% endraw %}{% unless minimal %} count: 1i32 {% endunless %}};
         contract.instantiate(&msg, Some(&admin), &[])?;
 
         // Return the interface
