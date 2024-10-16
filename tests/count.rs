@@ -1,27 +1,25 @@
 use {{project-name | snake_case}}::{
-    interface::ContractInterface,
-    msg::{GetCountResponse, InstantiateMsg, QueryMsg},
+    interface::{{project-name | upper_camel_case}}I,
+    msg::{GetCountResponse, QueryMsg},
     ContractError,
 };
 // Use prelude to get all the necessary imports
 use cw_orch::anyhow;
 use cw_orch::prelude::*;
 
-use cosmwasm_std::Addr;
-
-// consts for testing
+// constants for testing
 const USER: &str = "user";
 const ADMIN: &str = "admin";
 
 #[test]
 fn count() -> anyhow::Result<()> {
-    // Create a user
-    let user = Addr::unchecked(USER);
     // Create the mock. This will be our chain object throughout
     let mock = Mock::new(ADMIN);
 
-    // Set up the contract (Definition below) ↓↓
-    let contract = setup(mock.clone())?;
+    let user = mock.addr_make(USER);
+
+    // Set up the contract
+    let contract = {{project-name | upper_camel_case}}I::setup(mock.clone(), mock.sender().clone())?;
 
     // Increment the count of the contract
     contract
@@ -62,31 +60,4 @@ fn count() -> anyhow::Result<()> {
     );
 
     Ok(())
-}
-
-/// Instantiate the contract in any CosmWasm environment
-fn setup<Chain: CwEnv>(chain: Chain) -> anyhow::Result<ContractInterface<Chain>> {
-    // Construct the  interface
-    let contract = ContractInterface::new(chain.clone());
-    let admin = Addr::unchecked(ADMIN);
-
-    // Upload the contract
-    let upload_resp = contract.upload()?;
-
-    // Get the code-id from the response.
-    let code_id = upload_resp.uploaded_code_id()?;
-    // or get it from the interface.
-    assert_eq!(code_id, contract.code_id()?);
-
-    // Instantiate the contract
-    let msg = InstantiateMsg { count: 1i32 };
-    let init_resp = contract.instantiate(&msg, Some(&admin), &[])?;
-
-    // Get the address from the response
-    let contract_addr = init_resp.instantiated_contract_address()?;
-    // or get it from the interface.
-    assert_eq!(contract_addr, contract.address()?);
-
-    // Return the interface
-    Ok(contract)
 }

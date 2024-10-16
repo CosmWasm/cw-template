@@ -20,9 +20,15 @@ panic = 'abort'
 incremental = false
 overflow-checks = true
 
+[[bin]]
+name = "deploy"
+path = "src/bin/deploy.rs"
+required-features = ["deploy"]
+
 [features]
 # use library feature to disable all instantiate/execute/query exports
 library = []
+deploy = ["cw-orch/daemon", "dotenv", "env_logger"]
 
 [dependencies]
 cosmwasm-schema = "2.1.0"
@@ -39,8 +45,10 @@ thiserror = { version = "1.0.58" }
 
 cw-orch = { version = "0.26.0" }
 
+env_logger = { version = "0.11.5", optional = true }
+dotenv = { version = "0.15.0", optional = true }
+
 [dev-dependencies]
 {% unless minimal %}
 cw-multi-test = "2.0.0"
-cw-orch = { version = "0.26.0", features = ["daemon"] }
 {% endunless %}

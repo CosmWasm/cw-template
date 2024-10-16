@@ -4,9 +4,9 @@ use cw_orch::interface;
 use cw_orch::prelude::*;
 
 #[interface(InstantiateMsg, ExecuteMsg, QueryMsg, Empty, id = "{{project-name}}")]
-pub struct ContractInterface;
+pub struct {{project-name | upper_camel_case}}I;
 
-impl<Chain: CwEnv> Uploadable for ContractInterface<Chain> {
+impl<Chain: CwEnv> Uploadable for {{project-name | upper_camel_case}}I<Chain> {
     /// Return the path to the wasm file corresponding to the contract
     fn wasm(_info: &ChainInfoOwned) -> WasmPath {
         artifacts_dir_from_workspace!()
@@ -22,26 +22,21 @@ impl<Chain: CwEnv> Uploadable for ContractInterface<Chain> {
         ))
     }
 }
-{% unless minimal %}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::msg::{ExecuteMsgFns, QueryMsgFns};
-    use cw_orch::anyhow;
 
-    #[test]
-    fn contract_logic() -> anyhow::Result<()> {
-        let mock = Mock::new(&Addr::unchecked("sender"));
-        let contract = ContractInterface::new(mock);
+impl<Chain: CwEnv> {{project-name | upper_camel_case}}I<Chain> {
+    /// Instantiate the contract in any CosmWasm environment
+    pub fn setup(chain: Chain, admin: Addr) -> cw_orch::anyhow::Result<{{project-name | upper_camel_case}}I<Chain>> {
+        // Construct the interface
+        let contract = {{project-name | upper_camel_case}}I::new(chain.clone());
+
+        // Upload the contract
         contract.upload()?;
 
-        contract.instantiate(&InstantiateMsg { count: 7 }, None, &[])?;
-        assert_eq!(contract.get_count()?.count, 7);
+        // Instantiate the contract
+        let msg = InstantiateMsg { count: 1i32 };
+        contract.instantiate(&msg, Some(&admin), &[])?;
 
-        contract.increment()?;
-        assert_eq!(contract.get_count()?.count, 8);
-
-        Ok(())
+        // Return the interface
+        Ok(contract)
     }
 }
-{% endunless %}
