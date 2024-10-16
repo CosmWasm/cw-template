@@ -109,3 +109,19 @@ The wasm file is compiled deterministically (anyone else running the same
 docker on the same git commit should get the identical file with the same Sha256 hash).
 It is also stripped and minimized for upload to a blockchain (we will also
 gzip it in the uploading process to make it even smaller).
+
+## Deploying
+
+Copy `.env.example` to `.env` and fill in the mnemonic that you want to use for deployment.
+
+```sh
+cp .env.example .env
+```
+
+Then run the deploy script:
+
+```sh
+cargo deploy
+```
+
+You can change the network to deploy to in the `deploy.rs` file.
