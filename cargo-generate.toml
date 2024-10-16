@@ -19,6 +19,5 @@ ignore = [
     "Publishing.md",
     ".gitpod.yml",
     ".gitpod.Dockerfile",
-    "src/integration_tests.rs",
     "tests/",
 ]
