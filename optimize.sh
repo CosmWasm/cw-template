@@ -12,7 +12,5 @@ fi
 # Optimized builds
 docker run --rm -v "$(pwd)":/code \
   --mount type=volume,source="$(basename "$(pwd)")_cache",target=/code/target \
-  -v "$(dirname "$(pwd)")/integrations":/integrations \
-  -v "$(dirname "$(pwd)")/framework":/framework \
   --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
   ${image}
