@@ -112,13 +112,7 @@ gzip it in the uploading process to make it even smaller).
 
 ## Deploying
 
-Copy `.env.example` to `.env` and fill in the mnemonic that you want to use for deployment.
-
-```sh
-cp .env.example .env
-```
-
-Then run the deploy script:
+Fill in the mnemonic that you want to use for deployment in the `.env` file. Then run the deploy script:
 
 ```sh
 cargo deploy
