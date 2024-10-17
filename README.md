@@ -18,7 +18,6 @@ Unless you did that before, run this line now:
 
 ```sh
 cargo install cargo-generate --features vendored-openssl
-cargo install cargo-run-script
 ```
 
 Now, use it to create your new contract.
@@ -27,13 +26,13 @@ Go to the folder in which you want to place it and run:
 **Latest**
 
 ```sh
-cargo generate --git https://github.com/CosmWasm/cw-template.git --name PROJECT_NAME
+cargo generate --git https://github.com/AbstractSDK/cw-template.git --name PROJECT_NAME
 ```
 
 For cloning minimal code repo:
 
 ```sh
-cargo generate --git https://github.com/CosmWasm/cw-template.git --name PROJECT_NAME -d minimal=true
+cargo generate --git https://github.com/AbstractSDK/cw-template.git --name PROJECT_NAME -d minimal=true
 ```
 
 You will now have a new folder called `PROJECT_NAME` (I hope you changed that to something else)
@@ -74,6 +73,8 @@ Once you have your custom repo, you should check out [Developing](./Developing.m
 more on how to run tests and develop code. Or go through the
 [online tutorial](https://docs.cosmwasm.com/) to get a better feel
 of how to develop.
+
+This template includes [cw-orchestrator](https://docs.rs/cw-orch/latest/cw_orch/) by default. This library allows you to unit-test, integration-test as well as interact with your contracts on-chain using a common intuitive syntax that leverages rust type-safety to assist you throughout your development process. You can find the interface definitions in the [src/interface.rs](src/interface.rs) file. You can also find more information in the [`cw-orch` documentation](https://orchestrator.abstract.money/).
 
 [Publishing](./Publishing.md) contains useful information on how to publish your contract
 to the world, once you are ready to deploy it on a running blockchain. And

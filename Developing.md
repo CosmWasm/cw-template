@@ -71,10 +71,17 @@ produce an extremely small build output in a consistent manner. The suggest way
 to run it is this:
 
 ```sh
+chmod +x ./optimize.sh
+./optimize.sh
+```
+
+Which is equivalent to:
+
+```sh
 docker run --rm -v "$(pwd)":/code \
   --mount type=volume,source="$(basename "$(pwd)")_cache",target=/target \
   --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
-  cosmwasm/optimizer:0.15.0
+  cosmwasm/optimizer:0.16.1
 ```
 
 Or, If you're on an arm64 machine, you should use a docker image built with arm64.
@@ -83,7 +90,7 @@ Or, If you're on an arm64 machine, you should use a docker image built with arm6
 docker run --rm -v "$(pwd)":/code \
   --mount type=volume,source="$(basename "$(pwd)")_cache",target=/target \
   --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
-  cosmwasm/optimizer-arm64:0.15.0
+  cosmwasm/optimizer-arm64:0.16.1
 ```
 
 We must mount the contract code to `/code`. You can use an absolute path instead
@@ -102,3 +109,13 @@ The wasm file is compiled deterministically (anyone else running the same
 docker on the same git commit should get the identical file with the same Sha256 hash).
 It is also stripped and minimized for upload to a blockchain (we will also
 gzip it in the uploading process to make it even smaller).
+
+## Deploying
+
+Fill in the mnemonic that you want to use for deployment in the `.env` file. Then run the deploy script:
+
+```sh
+cargo deploy
+```
+
+You can change the network to deploy to in the `deploy.rs` file.

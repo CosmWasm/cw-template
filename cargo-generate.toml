@@ -12,6 +12,9 @@ The minimal template assumes you already know how to write your own logic, and d
 Would you like to generate the minimal template?"""
 default = false
 
+[hooks]
+post = ["post-script.rhai"]
+
 [conditional.'minimal']
 ignore = [
     "Developing.md",
@@ -19,5 +22,5 @@ ignore = [
     "Publishing.md",
     ".gitpod.yml",
     ".gitpod.Dockerfile",
-    "src/integration_tests.rs",
+    "tests/",
 ]

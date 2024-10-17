@@ -6,13 +6,14 @@ pub struct InstantiateMsg {% raw %}{{% endraw %}{% unless minimal %}
 {% endunless %}}
 
 #[cw_serde]
+#[derive(cw_orch::ExecuteFns)]
 pub enum ExecuteMsg {% raw %}{{% endraw %}{% unless minimal %}
     Increment {},
     Reset { count: i32 },
 {% endunless %}}
 
 #[cw_serde]
-#[derive(QueryResponses)]
+#[derive(QueryResponses, cw_orch::QueryFns)]
 pub enum QueryMsg {% raw %}{{% endraw %}{% unless minimal %}
     // GetCount returns the current count as a json-encoded number
     #[returns(GetCountResponse)]
