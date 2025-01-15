@@ -74,7 +74,7 @@ to run it is this:
 docker run --rm -v "$(pwd)":/code \
   --mount type=volume,source="$(basename "$(pwd)")_cache",target=/target \
   --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
-  cosmwasm/optimizer:0.15.0
+  cosmwasm/optimizer:0.16.0
 ```
 
 Or, If you're on an arm64 machine, you should use a docker image built with arm64.
@@ -83,7 +83,7 @@ Or, If you're on an arm64 machine, you should use a docker image built with arm6
 docker run --rm -v "$(pwd)":/code \
   --mount type=volume,source="$(basename "$(pwd)")_cache",target=/target \
   --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
-  cosmwasm/optimizer-arm64:0.15.0
+  cosmwasm/optimizer-arm64:0.16.0
 ```
 
 We must mount the contract code to `/code`. You can use an absolute path instead
