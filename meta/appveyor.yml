@@ -10,8 +10,8 @@
 image: Ubuntu
 
 environment:
-  TOOLCHAIN: 1.75.0
-  CARGO_GENERATE_VERSION: 0.18.3
+  TOOLCHAIN: 1.82.0
+  CARGO_GENERATE_VERSION: 0.22.1
 
 # services:
 #   - docker
@@ -31,7 +31,7 @@ install:
   - cargo --version
   - rustup target add wasm32-unknown-unknown
   # Use || true because this fails when already installed from cache
-  - cargo install --features vendored-openssl cargo-generate --version "$CARGO_GENERATE_VERSION" --debug || true
+  - cargo install --features vendored-openssl cargo-generate --locked --version "$CARGO_GENERATE_VERSION" --debug || true
 
 build_script:
   # No matter what is currently checked out by the CI (main, other branch, PR merge commit),
